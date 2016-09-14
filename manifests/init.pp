@@ -31,8 +31,8 @@ class sites (
     # improve DH key for Forward secrecy
     exec { 'generate DH key':
       command => '/usr/bin/openssl dhparam -out dhparam.pem 4096',
-      cwd     => '/etc/ssl/certs',
-      creates => '/etc/ssl/certs/dhparam.pem',
+      cwd     => '/etc/nginx/',
+      creates => '/etc/nginx/dh4096.pem',
     }
 
     $ssl_dhparam = '/etc/ssl/certs/dhparam.pem'
@@ -43,7 +43,7 @@ class sites (
   # only offer secure ssl ciphers:
   # https://blog.qualys.com/ssllabs/2013/08/05/configuring-apache-nginx-and-openssl-for-forward-secrecy
   if $ssl_secure {
-      $ssl_ciphers = 'EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS'
+      $ssl_ciphers = 'EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA !RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !MEDIUM'
   } else {
       $ssl_ciphers = undef
   }
