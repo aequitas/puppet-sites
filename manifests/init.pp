@@ -30,12 +30,12 @@ class sites (
 
     # improve DH key for Forward secrecy
     exec { 'generate DH key':
-      command => '/usr/bin/openssl dhparam -out dhparam.pem 4096',
+      command => '/usr/bin/openssl dhparam -out dh4096.pem 4096',
       cwd     => '/etc/nginx/',
       creates => '/etc/nginx/dh4096.pem',
     }
 
-    $ssl_dhparam = '/etc/nginx/dh4098.pem'
+    $ssl_dhparam = '/etc/nginx/dh4096.pem'
   } else {
     $ssl_dhparam = undef
   }
