@@ -1,0 +1,14 @@
+{
+  "name": "aequitas-sites",
+  "version": "0.1.0",
+  "author": "aequitas",
+  "summary": "Abstract resources for web hosting applications.",
+  "license": "Apache 2.0",
+  "source": "github.com/aequitas/puppet-sites",
+  "project_page": "https://github.com/aequitas/puppet-sites",
+  "issues_url": "https://github.com/aequitas/puppet-sites/issues",
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+  ]
+}
+
