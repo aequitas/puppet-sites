@@ -22,7 +22,7 @@ class sites (
   # TODO include php module in every php subresource
 
   create_resources(apps::static_php, $apps_static_php, {})
-  create_resources(vhost_webroot, $vhost_webroot, {})
+  create_resources(vhost::webroot, $vhost_webroot, {})
 
   # configure global letsencrypt if SSL is enabled
   if $ssl {
@@ -30,7 +30,7 @@ class sites (
 
     # improve DH key for Forward secrecy
     exec { 'generate DH key':
-      command => 'openssl dhparam -out dhparam.pem 4096'
+      command => 'openssl dhparam -out dhparam.pem 4096',
       cwd     => '/etc/ssl/certs',
       creates => '/etc/ssl/certs/dhparam.pem',
     }
