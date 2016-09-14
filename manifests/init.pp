@@ -1,21 +1,23 @@
 # setup generic config for nginx/php/mysql sites
 class sites (
-  # default vhost
+  ## default vhost
   $realm=$::fqdn,
   $default_vhost_content='',
 
-  # db related
+  ## db related
   $manage_mysql=true,
   $mysql_root_pw=undef,
   $pma=false,
   $pma_allow=[],
 
-  # global vhost settings
+  ## global vhost settings
+  # enable ssl
   $ssl=true,
+  # use more secure/less backward compatible ssl settings
   $ssl_secure=true,
   $root='/var/www',
 
-  # resource hashes for hiera
+  ## resource hashes for hiera
   $apps_static_php={},
   $vhost_webroot={},
 ){
@@ -27,25 +29,25 @@ class sites (
   # configure global letsencrypt if SSL is enabled
   if $ssl {
     class { 'letsencrypt': }
-
-    # improve DH key for Forward secrecy
-    exec { 'generate DH key':
-      command => '/usr/bin/openssl dhparam -out dh4096.pem 4096',
-      cwd     => '/etc/nginx/',
-      creates => '/etc/nginx/dh4096.pem',
-    }
-
-    $ssl_dhparam = '/etc/nginx/dh4096.pem'
-  } else {
-    $ssl_dhparam = undef
   }
 
   # only offer secure ssl ciphers:
   # https://blog.qualys.com/ssllabs/2013/08/05/configuring-apache-nginx-and-openssl-for-forward-secrecy
   if $ssl_secure {
       $ssl_ciphers = 'EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!MEDIUM'
+
+      # improve DH key for Forward secrecy
+      exec { 'generate DH key':
+        command => '/usr/bin/openssl dhparam -out dh4096.pem 4096',
+        cwd     => '/etc/nginx/',
+        creates => '/etc/nginx/dh4096.pem',
+      }
+
+      $ssl_dhparam = '/etc/nginx/dh4096.pem'
   } else {
-      $ssl_ciphers = undef
+    # offer default configuration of compatible ciphers
+    $ssl_ciphers = undef
+    $ssl_dhparam = undef
   }
 
   # nginx
