@@ -35,7 +35,7 @@ class sites (
       creates => '/etc/nginx/dh4096.pem',
     }
 
-    $ssl_dhparam = '/etc/ssl/certs/dhparam.pem'
+    $ssl_dhparam = '/etc/nginx/db4098.pem'
   } else {
     $ssl_dhparam = undef
   }
