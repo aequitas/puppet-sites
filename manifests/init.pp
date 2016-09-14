@@ -31,7 +31,8 @@ class sites (
   }
 
   # nginx
-  Anchor['nginx::begin'] -> class {'nginx::config':
+  Anchor['nginx::begin'] ->
+  class {'nginx::config':
     # global caching settings
     fastcgi_cache_path      =>  "${root}/cache",
     fastcgi_cache_key       =>  '"$scheme$request_method$host$request_uri"',
