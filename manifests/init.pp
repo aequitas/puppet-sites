@@ -30,7 +30,7 @@ class sites (
 
     # improve DH key for Forward secrecy
     exec { 'generate DH key':
-      command => 'openssl dhparam -out dhparam.pem 4096',
+      command => '/usr/bin/openssl dhparam -out dhparam.pem 4096',
       cwd     => '/etc/ssl/certs',
       creates => '/etc/ssl/certs/dhparam.pem',
     }
