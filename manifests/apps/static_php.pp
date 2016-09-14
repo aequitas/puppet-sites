@@ -20,8 +20,10 @@ define sites::apps::static_php (
   $root = "/var/www/${title}"
   $webroot = "${root}/html"
 
+  include ::cron
+
   # include module global php config
-  include ::sites::php
+  include php
 
   ensure_packages(['php5-cli'], {'ensure' => 'present'})
 
