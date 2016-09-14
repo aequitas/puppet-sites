@@ -31,9 +31,15 @@ define sites::vhosts::webroot (
   if $ssl {
     $certfile = "${::letsencrypt::cert_root}/${letsencrypt_name}/fullchain.pem"
     $keyfile = "${::letsencrypt::cert_root}/${letsencrypt_name}/privkey.pem"
+    $ssl_headers = {
+      'Strict-Transport-Security' => 'max-age=31536000; includeSubdomains',
+      'X-Frame-Options'           => 'DENY',
+      'X-Content-Type-Options'    => nosniff,
+    }
   } else {
     $certfile = undef
     $keyfile = undef
+    $ssl_headers = {}
   }
 
   # array of all server names to listen for
@@ -92,7 +98,8 @@ define sites::vhosts::webroot (
     location_deny          => $location_deny,
     vhost_cfg_append       => {
       'expires' => $expires,
-    }
+    },
+    add_header             => $ssl_headers,
   }
 
   # disable exposing php files
@@ -102,6 +109,7 @@ define sites::vhosts::webroot (
     www_root      => $webroot,
     location      => '~ \.php$',
     location_deny => ['all'],
+    add_header    => $ssl_headers,
   }
 
   # cache static files a lot
@@ -112,7 +120,8 @@ define sites::vhosts::webroot (
     location            => '~* \.(?:ico|css|js|gif|jpe?g|png)$',
     location_cfg_append => {
       'expires' => $static_expires,
-    }
+      },
+    add_header          => $ssl_headers,
   }
 
   # configure letsencrypt
