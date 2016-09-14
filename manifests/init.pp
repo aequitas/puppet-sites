@@ -35,9 +35,9 @@ class sites (
       creates => '/etc/ssl/certs/dhparam.pem',
     }
 
-    $dhparam = '/etc/ssl/certs/dhparam.pem'
+    $ssl_dhparam = '/etc/ssl/certs/dhparam.pem'
   } else {
-    $dhparam = undef
+    $ssl_dhparam = undef
   }
 
   # only offer secure ssl ciphers:
