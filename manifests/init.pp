@@ -42,8 +42,6 @@ class sites (
     log_format              => {
       cache => '$remote_addr - $upstream_cache_status [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent',
     },
-    # global ssl settings
-    ssl_ciphers             => $ssl_ciphers,
   }
   class {'nginx': }
 
