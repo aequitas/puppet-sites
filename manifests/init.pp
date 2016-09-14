@@ -22,7 +22,7 @@ class sites (
   # TODO include php module in every php subresource
 
   create_resources(apps::static_php, $apps_static_php, {})
-  create_resources(vhost::webroot, $vhost_webroot, {})
+  create_resources(vhosts::webroot, $vhost_webroot, {})
 
   # configure global letsencrypt if SSL is enabled
   if $ssl {
