@@ -34,7 +34,7 @@ class sites (
   Anchor['nginx::begin'] ->
   class {'nginx::config':
     # global caching settings
-    fastcgi_cache_path      =>  "${root}/cache",
+    fastcgi_cache_path      =>  "${root}/cache/",
     fastcgi_cache_key       =>  '"$scheme$request_method$host$request_uri"',
     fastcgi_cache_keys_zone =>  'default:250m',
     fastcgi_cache_max_size  =>  '500m',
