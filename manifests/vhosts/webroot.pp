@@ -13,6 +13,7 @@ define sites::vhosts::webroot (
   $static_expires='30d',
   $ssl=$::sites::ssl,
   $ssl_ciphers=$::sites::ssl_ciphers,
+  $ssl_dhparam=$::sites::ssl_dhparam,
   $rewrite_to_https=$::sites::ssl,
 ){
   if $default_vhost {
@@ -94,6 +95,7 @@ define sites::vhosts::webroot (
     ssl_key                => $keyfile,
     ssl_cert               => $certfile,
     ssl_ciphers            => $ssl_ciphers,
+    ssl_dhparam            => $ssl_dhparam,
     rewrite_to_https       => $rewrite_to_https,
     rewrite_www_to_non_www => $rewrite_www_to_non_www,
     location_allow         => $location_allow,

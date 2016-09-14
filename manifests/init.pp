@@ -23,6 +23,22 @@ class sites (
 
   create_resources(apps::static_php, $apps_static_php, {})
 
+  # configure global letsencrypt if SSL is enabled
+  if $ssl {
+    class { 'letsencrypt': }
+
+    # improve DH key for Forward secrecy
+    exec { 'generate DH key':
+      command => 'openssl dhparam -out dhparam.pem 4096'
+      cwd => '/etc/ssl/certs',
+      creates => '/etc/ssl/certs/dhparam.pem',
+    }
+
+    $dhparam = '/etc/ssl/certs/dhparam.pem'
+  } else {
+    $dhparam = undef
+  }
+
   # only offer secure ssl ciphers:
   # https://blog.qualys.com/ssllabs/2013/08/05/configuring-apache-nginx-and-openssl-for-forward-secrecy
   if $ssl_secure {
@@ -55,11 +71,6 @@ class sites (
       ensure => directory;
     "${root}/cache":
       ensure => directory,
-  }
-
-  # configure global letsencrypt if SSL is enabled
-  if $ssl {
-    class { 'letsencrypt': }
   }
 
   # dbs
