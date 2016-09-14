@@ -109,7 +109,6 @@ define sites::vhosts::webroot (
     www_root      => $webroot,
     location      => '~ \.php$',
     location_deny => ['all'],
-    add_header    => $ssl_headers,
   }
 
   # cache static files a lot
@@ -120,8 +119,7 @@ define sites::vhosts::webroot (
     location            => '~* \.(?:ico|css|js|gif|jpe?g|png)$',
     location_cfg_append => {
       'expires' => $static_expires,
-      },
-    add_header          => $ssl_headers,
+    },
   }
 
   # configure letsencrypt
