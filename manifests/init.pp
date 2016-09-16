@@ -16,6 +16,7 @@ class sites (
   # use more secure/less backward compatible ssl settings
   $ssl_secure=true,
   $root='/var/www',
+  $dh_keysize=2048,
 
   ## resource hashes for hiera
   $apps_static_php={},
@@ -38,12 +39,12 @@ class sites (
 
       # improve DH key for Forward secrecy
       exec { 'generate DH key':
-        command => '/usr/bin/openssl dhparam -out dh4096.pem 4096',
+        command => "/usr/bin/openssl dhparam -out dh${dh_keysize}.pem ${dh_keysize}",
         cwd     => '/etc/nginx/',
-        creates => '/etc/nginx/dh4096.pem',
+        creates => "/etc/nginx/dh${dh_keysize}.pem",
       }
 
-      $ssl_dhparam = '/etc/nginx/dh4096.pem'
+      $ssl_dhparam = "/etc/nginx/dh${dh_keysize}.pem"
   } else {
     # offer default configuration of compatible ciphers
     $ssl_ciphers = undef
