@@ -15,6 +15,7 @@ define sites::vhosts::webroot (
   $ssl_ciphers=$::sites::ssl_ciphers,
   $ssl_dhparam=$::sites::ssl_dhparam,
   $rewrite_to_https=$::sites::ssl,
+  $ipv6=true,
 ){
   if $default_vhost {
     $server_name = '_'
@@ -91,6 +92,7 @@ define sites::vhosts::webroot (
     www_root               => $webroot,
     index_files            => ['index.html'],
     listen_options         => $listen_options,
+    ipv6_enable            => true,
     ssl                    => $ssl,
     ssl_key                => $keyfile,
     ssl_cert               => $certfile,
