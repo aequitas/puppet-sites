@@ -28,6 +28,8 @@ define sites::vhosts::webroot (
     $server_name = $name
     $realm_host = regsubst($server_name, '\.', '_')
     $realm_name = "${realm_host}.${realm}"
+    $listen_options = ''
+    $ipv6_listen_options = ''
     $letsencrypt_name = $server_name
     $_nowww_compliance = $nowww_compliance
   }
