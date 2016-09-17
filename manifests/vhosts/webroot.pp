@@ -22,6 +22,7 @@ define sites::vhosts::webroot (
     $realm_name = $realm
     $letsencrypt_name = $realm
     $listen_options = 'default_server'
+    $ipv6_listen_options = 'default_server'
     $_nowww_compliance = 'class_c'
   } else {
     $server_name = $name
@@ -92,6 +93,7 @@ define sites::vhosts::webroot (
     www_root               => $webroot,
     index_files            => ['index.html'],
     listen_options         => $listen_options,
+    ipv6_listen_options    => $ipv6_listen_options,
     ipv6_enable            => true,
     ssl                    => $ssl,
     ssl_key                => $keyfile,
