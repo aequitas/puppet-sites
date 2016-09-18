@@ -1,21 +1,29 @@
 # vhost just serving static content
 define sites::vhosts::webroot (
+  # domain name settings
   $domain=$name,
   $realm=$sites::realm,
-  $webroot="/var/www/${name}/html/",
   $default_vhost=false,
-  $location_allow=undef,
-  $location_deny=undef,
+  # additional subdomains (no www.)
   $subdomains=[],
   # http://no-www.org/index.php
   $nowww_compliance='class_b',
-  $expires='10m',
-  $static_expires='30d',
+  # connection settings
+  $ipv6=true,
+  # SSL settings
   $ssl=$::sites::ssl,
+  $rewrite_to_https=$::sites::ssl,
   $ssl_ciphers=$::sites::ssl_ciphers,
   $ssl_dhparam=$::sites::ssl_dhparam,
-  $rewrite_to_https=$::sites::ssl,
-  $ipv6=true,
+  # cache settings
+  $expires='10m',
+  $static_expires='30d',
+  # access settings
+  $location_allow=undef,
+  $location_deny=undef,
+  # paths
+  $root="${::sites::root}/${name}/",
+  $webroot="${::sites::root}/${name}/html/",
 ){
   if $default_vhost {
     $server_name = '_'
@@ -81,14 +89,14 @@ define sites::vhosts::webroot (
   }
 
   file {
-    "/var/www/${name}/":
-    ensure => directory,
-    owner  => www-data,
-    group  => www-data;
+    $root:
+      ensure => directory,
+      owner  => www-data,
+      group  => www-data;
     $webroot:
-    ensure => directory,
-    owner  => www-data,
-    group  => www-data;
+      ensure => directory,
+      owner  => www-data,
+      group  => www-data;
   } ->
   nginx::resource::vhost { $name:
     server_name            => [$server_name, $realm_name],
