@@ -1,6 +1,9 @@
 # generic vhost serving static content under webroot
 # supports subdomains, ssl, ipv6, caching and no-www
-define sites::vhosts::webroot (
+define sites::vhosts::proxy (
+  # proxy settings
+  $proxy=undef,
+
   # domain name settings
   $domain=$name,
   $realm=$sites::realm,
@@ -24,17 +27,13 @@ define sites::vhosts::webroot (
   $location_deny=undef,
   # paths
   $root="${::sites::root}/${name}/",
-  $webroot="${::sites::root}/${name}/html/",
 ){
-  file {
-    $webroot:
-      ensure => directory,
-      owner  => www-data,
-      group  => www-data;
+  nginx::resource::upstream { $name:
+    members => [$proxy]
   }
 
   Nginx::Resource::Vhost {
-    www_root => $webroot,
+    proxy => "http://${proxy}",
   }
 
   vhost { $name:
@@ -53,25 +52,5 @@ define sites::vhosts::webroot (
     location_allow   => $location_allow,
     location_deny    => $location_deny,
     root             => $root,
-  }
-
-  # disable exposing php files
-  nginx::resource::location { "${name}-php":
-    vhost         => $name,
-    ssl           => $ssl,
-    www_root      => $webroot,
-    location      => '~ \.php$',
-    location_deny => ['all'],
-  }
-
-  # cache static files a lot
-  nginx::resource::location { "${name}-static_cache":
-    vhost               => $name,
-    ssl                 => $ssl,
-    www_root            => $webroot,
-    location            => '~* \.(?:ico|css|js|gif|jpe?g|png)$',
-    location_cfg_append => {
-      'expires' => $static_expires,
-    },
   }
 }

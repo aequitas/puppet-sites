@@ -20,12 +20,15 @@ class sites (
 
   ## resource hashes for hiera
   $apps_static_php={},
+
   $vhost_webroot={},
+  $vhost_proxy={},
 ){
   # TODO include php module in every php subresource
 
   create_resources(apps::static_php, $apps_static_php, {})
   create_resources(vhosts::webroot, $vhost_webroot, {})
+  create_resources(vhosts::proxy, $vhost_proxy, {})
 
   # configure global letsencrypt if SSL is enabled
   if $ssl {
