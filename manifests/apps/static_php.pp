@@ -1,7 +1,9 @@
 # Website from statically generated PHP.
 define sites::apps::static_php (
+  # manage wwwroot contect from git repository
   $git_source=undef,
 
+  # manage config file
   $config_filename=undef,
   $config_template=undef,
 
@@ -17,15 +19,14 @@ define sites::apps::static_php (
   $vhost=true,
   $web_user='www-data',
 ){
-  $root = "/var/www/${title}"
-  $webroot = "${root}/html"
+  # paths
+  $root="${::sites::root}/${name}/",
+  $webroot="${::sites::root}/${name}/html/",
 
   include ::cron
 
   # include module global php config
-  include php
-
-  ensure_packages(['php5-cli'], {'ensure' => 'present'})
+  include ::sites::php::cli
 
   if $git_source {
     ensure_packages(['git'], {'ensure' => 'present'})
