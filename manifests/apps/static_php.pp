@@ -20,8 +20,8 @@ define sites::apps::static_php (
   $web_user='www-data',
 ){
   # paths
-  $root="${::sites::root}/${name}/"
-  $webroot="${::sites::root}/${name}/html/"
+  $root="${::sites::root}/${name}"
+  $webroot="${::sites::root}/${name}/html"
 
   include ::cron
 
