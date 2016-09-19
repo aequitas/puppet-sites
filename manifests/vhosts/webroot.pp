@@ -35,6 +35,7 @@ define sites::vhosts::webroot (
 
   Nginx::Resource::Vhost {
     www_root => $webroot,
+    index_files => ['index.html', 'index.html'],
   }
 
   vhost { $name:
