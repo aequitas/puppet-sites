@@ -61,11 +61,16 @@ class sites (
   Anchor['nginx::begin'] ->
   class {'nginx::config':
     # global caching settings
-    fastcgi_cache_path      =>  "${root}/cache/",
-    fastcgi_cache_key       =>  '"$scheme$request_method$host$request_uri"',
-    fastcgi_cache_keys_zone =>  'default:250m',
-    fastcgi_cache_max_size  =>  '500m',
-    fastcgi_cache_inactive  =>  '30m',
+    fastcgi_cache_path      => "${root}/cache/",
+    fastcgi_cache_key       => '"$scheme$request_method$host$request_uri"',
+    fastcgi_cache_keys_zone => 'default:250m',
+    fastcgi_cache_max_size  => '500m',
+    fastcgi_cache_inactive  => '30m',
+    fastcgi_cache_use_stale => updating,
+    names_hash_bucket_size  => 80,
+    http_cfg_append         => {
+      fastcgi_cache_lock => on,
+    },
     log_format              => {
       cache => '$remote_addr - $upstream_cache_status [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent',
     },

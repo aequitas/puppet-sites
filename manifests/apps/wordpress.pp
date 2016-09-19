@@ -19,6 +19,9 @@ define sites::apps::wordpress (
   # propagate vhost settings
   $ssl=true,
   $nowww_compliance='class_b',
+
+  # access settings
+  $whitelist=undef,
 ){
   # paths
   $root="${::sites::root}/${name}/"
@@ -27,6 +30,7 @@ define sites::apps::wordpress (
 
   # include module global php config
   include ::sites::php::fpm
+  include ::sites::vhosts::map
 
   if $mysql_manage_db {
     if $mysql_db_init_filename {
@@ -96,6 +100,29 @@ define sites::apps::wordpress (
       members => [
           "unix:/var/run/php5-fpm-${name}.sock",
       ],
+  }
+
+  # disable caching and provide ACL for /wp-admin
+  nginx::resource::location { "${name}-wp-admin":
+    vhost          => $name,
+    priority       => 450,
+    ssl            => $ssl,
+    www_root       => $webroot,
+    location       => '/wp-admin/',
+    location_deny  => [all],
+    location_allow => $whitelist,
+  }
+  # disable caching and provide ACL for /wp-admin
+  nginx::resource::location { "${name}-wp-admin-php":
+    vhost          => $name,
+    priority       => 450,
+    ssl            => $ssl,
+    www_root       => $webroot,
+    location       => '~ ^/wp-.*\.php$',
+    location_deny  => [all],
+    location_allow => $whitelist,
+    fastcgi        => $name,
+    fastcgi_params => '/etc/nginx/fastcgi_params',
   }
 
   if $vhost {

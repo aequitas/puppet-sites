@@ -24,6 +24,7 @@ define sites::vhosts::vhost (
   $location_deny=undef,
   # paths
   $root="${::sites::root}/${name}/",
+  $vhost_cfg_append={},
 ){
   validate_re($nowww_compliance, '^class_[abc]$')
 
@@ -100,6 +101,11 @@ define sites::vhosts::vhost (
         "Class C no-www compliance specified, but a wwww. domain in subdomains: ${validate_domains}.")
   }
 
+  $_vhost_cfg_append = merge({
+    'expires'    => $expires,
+    'access_log' => "/var/log/nginx/${server_name}.cache.log cache",
+  }, $vhost_cfg_append)
+
   file {
     $root:
       ensure => directory,
@@ -120,9 +126,7 @@ define sites::vhosts::vhost (
     rewrite_www_to_non_www => $rewrite_www_to_non_www,
     location_allow         => $location_allow,
     location_deny          => $location_deny,
-    vhost_cfg_append       => {
-      'expires' => $expires,
-    },
+    vhost_cfg_append       => $_vhost_cfg_append,
     add_header             => $ssl_headers,
   }
 

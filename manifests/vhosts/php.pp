@@ -25,6 +25,8 @@ define sites::vhosts::php (
   # paths
   $root="${::sites::root}/${name}/",
   $webroot="${::sites::root}/${name}/html/",
+  # cache settings
+  $cache_bypass='',
 ){
   file {
     $webroot:
@@ -53,20 +55,30 @@ define sites::vhosts::php (
     location_allow   => $location_allow,
     location_deny    => $location_deny,
     root             => $root,
+    vhost_cfg_append => {
+      'set $no_cache' => "''",
+    }
   }
 
-  nginx::resource::location { $name:
-    vhost          => $name,
-    ssl            => $ssl,
-    www_root       => $webroot,
-    location       => '~ \.php$',
-    fastcgi_params => '/etc/nginx/fastcgi_params',
-    fastcgi        => $name,
-    try_files      => ['$uri', '$uri/', '/index.php?$args'],
+  nginx::resource::location { "${name}-php":
+    vhost               => $name,
+    ssl                 => $ssl,
+    www_root            => $webroot,
+    location            => '~ \.php$',
+    fastcgi             => $name,
+    fastcgi_params      => '/etc/nginx/fastcgi_params',
+    try_files           => ['$uri', '$uri/', '/index.php?$args'],
+    internal            => true,
+    location_cfg_append => {
+      fastcgi_cache          => 'default',
+      fastcgi_cache_bypass   => '$cache_bypass_cookie$no_cache',
+      fastcgi_cache_valid    => $expires,
+      fastcgi_ignore_headers => 'Cache-Control Expires Set-Cookie',
+    },
   }
 
   # cache static files a lot
-  nginx::resource::location { "${name}-static_cache":
+  nginx::resource::location { "${name}-static-cache":
     vhost               => $name,
     ssl                 => $ssl,
     www_root            => $webroot,
