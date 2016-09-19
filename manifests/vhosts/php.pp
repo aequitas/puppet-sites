@@ -1,6 +1,6 @@
 # generic vhost serving static content under webroot
 # supports subdomains, ssl, ipv6, caching and no-www
-define sites::vhosts::webroot (
+define sites::vhosts::php (
   # domain name settings
   $domain=$name,
   $realm=$sites::realm,
@@ -34,7 +34,7 @@ define sites::vhosts::webroot (
   }
 
   Nginx::Resource::Vhost {
-    www_root => $webroot,
+    www_root    => $webroot,
   }
 
   vhost { $name:
@@ -52,15 +52,17 @@ define sites::vhosts::webroot (
     static_expires   => $static_expires,
     location_allow   => $location_allow,
     location_deny    => $location_deny,
+    root             => $root,
   }
 
-  # disable exposing php files
-  nginx::resource::location { "${name}-php":
-    vhost         => $name,
-    ssl           => $ssl,
-    www_root      => $webroot,
-    location      => '~ \.php$',
-    location_deny => ['all'],
+  nginx::resource::location { $name:
+    vhost          => $name,
+    ssl            => $ssl,
+    www_root       => $webroot,
+    location       => '~ \.php$',
+    fastcgi_params => '/etc/nginx/fastcgi_params',
+    fastcgi        => $name,
+    try_files      => ['$uri', '$uri/', '/index.php?$args'],
   }
 
   # cache static files a lot

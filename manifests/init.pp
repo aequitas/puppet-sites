@@ -20,6 +20,7 @@ class sites (
 
   ## resource hashes for hiera
   $apps_static_php={},
+  $apps_wordpress={},
 
   $vhost_webroot={},
   $vhost_proxy={},
@@ -27,6 +28,8 @@ class sites (
   # TODO include php module in every php subresource
 
   create_resources(apps::static_php, $apps_static_php, {})
+  create_resources(apps::wordpress, $apps_wordpress, {})
+
   create_resources(vhosts::webroot, $vhost_webroot, {})
   create_resources(vhosts::proxy, $vhost_proxy, {})
 
@@ -90,7 +93,9 @@ class sites (
 
   # default realm vhost
   sites::vhosts::webroot {$realm:
-      default_vhost => true,
+      default_vhost    => true,
+      nowww_compliance => 'class_c',
+      rewrite_to_https => false,
   }
   file { "/var/www/${realm}/html/index.html":
     content => $default_vhost_content,

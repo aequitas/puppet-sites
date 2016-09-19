@@ -33,15 +33,14 @@ define sites::vhosts::vhost (
     $letsencrypt_name = $realm
     $listen_options = 'default_server'
     $ipv6_listen_options = 'default_server'
-    $_nowww_compliance = 'class_c'
+    validate_re($nowww_compliance, '^class_c$', 'realm must have Class C nowww compliance')
   } else {
     $server_name = $name
-    $realm_host = regsubst($server_name, '\.', '_')
+    $realm_host = regsubst($server_name, '\.', '-')
     $realm_name = "${realm_host}.${realm}"
     $listen_options = ''
     $ipv6_listen_options = ''
     $letsencrypt_name = $server_name
-    $_nowww_compliance = $nowww_compliance
   }
 
   if $ssl {
@@ -58,33 +57,39 @@ define sites::vhosts::vhost (
     $ssl_headers = {}
   }
 
-  # array of all server names to listen for
+  # array of all provided hostnames
   $server_names = concat([], $server_name, $subdomains, $realm_name)
 
   # configure non-www compliancy
   # http://no-www.org/faq.php
   # www point to the same content as non-www domains
-  if $_nowww_compliance == 'class_a' {
+  if $nowww_compliance == 'class_a' {
     $rewrite_www_to_non_www = false
     # add letsencrypt hostnames with www for every hostname
-    $le_subdomains = concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'))
+    $le_subdomains = concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'), $realm_name)
+    # listen to name, subdomains and all www. version of them
+    $listen_domains = concat([], $letsencrypt_name, $le_subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
     validate_re($validate_domains, '^(?!.*www\.).*$',
         "Class A no-www compliance specified, but www. domain specified in title or subdomains : ${validate_domains}.")
   }
   # www domains redirect to non-www domains
-  if $_nowww_compliance == 'class_b' {
+  if $nowww_compliance == 'class_b' {
     $rewrite_www_to_non_www = true
     # add letsencrypt hostnames with www for every hostname
-    $le_subdomains = concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'))
+    $le_subdomains = concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'), $realm_name)
+    # www-redirect manages www names, only listen to name and subdomains
+    $listen_domains = concat([], $letsencrypt_name, $subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
     validate_re($validate_domains, '^(?!.*www\.).*$',
         "Class B no-www compliance specified, but www. domain specified in title or subdomains : ${validate_domains}.")
   }
   # www domains do not exist
-  if $_nowww_compliance == 'class_c' {
+  if $nowww_compliance == 'class_c' {
     $rewrite_www_to_non_www = false
-    $le_subdomains = $subdomains
+    $le_subdomains = concat($subdomains, $realm_name)
+    # only listen to name and subdomains
+    $listen_domains = concat([], $letsencrypt_name, $subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
     validate_re($validate_domains, '^(?!.*www\.).*$',
         "Class C no-www compliance specified, but a wwww. domain in subdomains: ${validate_domains}.")
@@ -97,8 +102,7 @@ define sites::vhosts::vhost (
       group  => www-data;
   } ->
   nginx::resource::vhost { $name:
-    server_name            => [$server_name, $realm_name],
-    index_files            => ['index.html'],
+    server_name            => $listen_domains,
     listen_options         => $listen_options,
     ipv6_listen_options    => $ipv6_listen_options,
     ipv6_enable            => true,
