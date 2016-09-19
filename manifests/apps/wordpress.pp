@@ -8,7 +8,7 @@ define sites::apps::wordpress (
   $mysql_manage_db=true,
   $mysql_db_name=$title,
   $mysql_db_user=regsubst($title, '(.{16}).*', '\1'),
-  $mysql_db_password=fqdn_rand_string(32, '', ::sites_seed),
+  $mysql_db_password=fqdn_rand_string(32, '', "${::sites_seed}${name}"),
   $mysql_db_host=localhost,
   $mysql_db_init_filename=undef,
 
@@ -32,7 +32,7 @@ define sites::apps::wordpress (
     if $mysql_db_init_filename {
       $schema = "${root}/${mysql_db_init_filename}"
     } else {
-      $schema = "/var/backups/mysql/${title}.sql"
+      $schema = "/var/backups/mysql/${name}.sql"
     }
     mysql::db { $mysql_db_name:
       user     => $mysql_db_user,
@@ -41,6 +41,18 @@ define sites::apps::wordpress (
       grant    => ['SELECT', 'UPDATE', 'INSERT', 'DELETE'],
       sql      => $schema,
     }
+  }
+
+  if $ssl {
+    $siteurl_proto = 'https://'
+  } else {
+    $siteurl_proto = 'http://'
+  }
+
+  if $nowww_compliance == 'class_a' {
+    $siteurl = "${siteurl_proto}www.${name}"
+  } else {
+    $siteurl = "${siteurl_proto}${name}"
   }
 
   # put db config in wp-config.php
@@ -60,6 +72,12 @@ define sites::apps::wordpress (
       path   => "${webroot}/wp-config.php",
       line   => "define('DB_PASSWORD', '${mysql_db_password}');",
       match  => "^define.'DB_PASSWORD'";
+    "${name}-siteurl":
+      ensure => present,
+      path   => "${webroot}/wp-config.php",
+      line   => "define('WP_SITEURL', '${siteurl}');",
+      after  => '',
+      match  => "^define.'WP_SITEURL'";
   }
 
   Package['nginx'] ->
@@ -82,7 +100,7 @@ define sites::apps::wordpress (
 
   if $vhost {
     include ::sites
-    sites::vhosts::php { $title:
+    sites::vhosts::php { $name:
       nowww_compliance => $nowww_compliance,
       ssl              => $ssl,
     }
