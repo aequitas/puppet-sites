@@ -71,7 +71,7 @@ define sites::vhosts::vhost (
   if $nowww_compliance == 'class_a' {
     $rewrite_www_to_non_www = false
     # add letsencrypt hostnames with www for every hostname
-    $le_subdomains = concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'), $realm_name)
+    $le_subdomains = unique(concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'), $realm_name))
     # listen to name, subdomains and all www. version of them
     $listen_domains = concat([], $server_name, $le_subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
@@ -82,7 +82,7 @@ define sites::vhosts::vhost (
   if $nowww_compliance == 'class_b' {
     $rewrite_www_to_non_www = true
     # add letsencrypt hostnames with www for every hostname
-    $le_subdomains = concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'), $realm_name)
+    $le_subdomains = unique(concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'), $realm_name))
     # www-redirect manages www names, only listen to name and subdomains
     $listen_domains = concat([], $server_name, $subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
@@ -92,7 +92,7 @@ define sites::vhosts::vhost (
   # www domains do not exist
   if $nowww_compliance == 'class_c' {
     $rewrite_www_to_non_www = false
-    $le_subdomains = concat($subdomains, $realm_name)
+    $le_subdomains = unique(concat($subdomains, $realm_name))
     # only listen to name and subdomains
     $listen_domains = concat([], $server_name, $subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
