@@ -7,6 +7,8 @@ class sites (
   ## db related
   $manage_mysql=true,
   $mysql_root_pw=undef,
+  $mysql_backup_pw=undef,
+  $mysql_backuprotate=undef,
   $pma=false,
   $pma_allow=[],
 
@@ -99,6 +101,7 @@ class sites (
         backuppassword    => $mysql_backup_pw,
         backupdir         => '/var/backups/mysql/',
         file_per_database => true,
+        backuprotate      => $mysql_backuprotate,
     }
   }
 
