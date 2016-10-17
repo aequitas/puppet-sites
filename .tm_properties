@@ -1,0 +1,2 @@
+excludeInFileChooser = "{$exclude,vendor}"
+excludeInFolderSearch = "{$exclude,vendor}"
