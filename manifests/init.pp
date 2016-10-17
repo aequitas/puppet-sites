@@ -94,6 +94,12 @@ class sites (
         root_password           => $mysql_root_pw,
         remove_default_accounts => true,
     }
+    class { '::mysql::server::backup':
+        backupuser        => backup,
+        backuppassword    => $mysql_backup_pw,
+        backupdir         => '/var/backups/mysql/',
+        file_per_database => true,
+    }
   }
 
   # default realm vhost
