@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# generate static index.html
+
+set -e
+
+logfile="<%= @logroot %>/generate.log"
+exec 2>>"$logfile"
+
+cd "<%= @webroot %>"
+
+timeout 600 /usr/bin/php index.php > index.html_
+
+mv index.html_ index.html

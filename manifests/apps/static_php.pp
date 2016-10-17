@@ -22,6 +22,7 @@ define sites::apps::static_php (
   # paths
   $root="${::sites::root}/${name}"
   $webroot="${::sites::root}/${name}/html"
+  $logroot="${::sites::root}/${name}/logs"
 
   include ::cron
 
@@ -65,10 +66,24 @@ define sites::apps::static_php (
   }
 
   file { "${root}/generate.sh":
-    content => "cd ${webroot}/; timeout 600 /usr/bin/php index.php > index.html_;mv index.html_ index.html\n",
+    content => template('sites/generate.sh.erb'),
     mode    => '0755',
     owner   => $web_user,
     group   => $web_user,
+  }
+
+  file { $logroot:
+    ensure => directory,
+    mode   => '0755',
+    owner  => $web_user,
+    group  => $web_user,
+  }
+
+  logrotate::rule { "static_php_${title}":
+    path         => $logroot,
+    compress     => true,
+    rotate       => 5,
+    rotate_every => 'week',
   }
 
   # generate index.html for index.php file every 10 minutes.
