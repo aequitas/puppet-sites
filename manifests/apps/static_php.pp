@@ -2,6 +2,7 @@
 define sites::apps::static_php (
   # manage wwwroot contect from git repository
   $git_source=undef,
+  $git_revision=master,
 
   # manage config file
   $config_filename=undef,
@@ -36,7 +37,7 @@ define sites::apps::static_php (
       ensure   => latest,
       provider => git,
       source   => $git_source,
-      revision => master,
+      revision => $git_revision,
       owner    => $web_user,
       group    => $web_user,
     }
