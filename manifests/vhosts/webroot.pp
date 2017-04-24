@@ -33,7 +33,7 @@ define sites::vhosts::webroot (
       group  => www-data;
   }
 
-  Nginx::Resource::Vhost {
+  Nginx::Resource::Server {
     www_root => $webroot,
     index_files => ['index.html', 'index.htm'],
   }
@@ -57,7 +57,7 @@ define sites::vhosts::webroot (
 
   # disable exposing php files
   nginx::resource::location { "${name}-php":
-    vhost         => $name,
+    server        => $name,
     ssl           => $ssl,
     www_root      => $webroot,
     location      => '~ \.php$',
@@ -66,7 +66,7 @@ define sites::vhosts::webroot (
 
   # cache static files a lot
   nginx::resource::location { "${name}-static_cache":
-    vhost               => $name,
+    server              => $name,
     ssl                 => $ssl,
     www_root            => $webroot,
     location            => '~* \.(?:ico|css|js|gif|jpe?g|png)$',

@@ -112,7 +112,7 @@ define sites::vhosts::vhost (
       owner  => www-data,
       group  => www-data;
   } ->
-  nginx::resource::vhost { $name:
+  nginx::resource::server { $name:
     server_name            => $listen_domains,
     listen_options         => $listen_options,
     ipv6_listen_options    => $ipv6_listen_options,
@@ -122,11 +122,11 @@ define sites::vhosts::vhost (
     ssl_cert               => $certfile,
     ssl_ciphers            => $ssl_ciphers,
     ssl_dhparam            => $ssl_dhparam,
-    rewrite_to_https       => $rewrite_to_https,
+    ssl_redirect           => $rewrite_to_https,
     rewrite_www_to_non_www => $rewrite_www_to_non_www,
     location_allow         => $location_allow,
     location_deny          => $location_deny,
-    vhost_cfg_append       => $_vhost_cfg_append,
+    server_cfg_append      => $_vhost_cfg_append,
     add_header             => $ssl_headers,
   }
 
@@ -137,7 +137,7 @@ define sites::vhosts::vhost (
     }
     nginx::resource::location { "letsencrypt_${name}":
       location       => '/.well-known/acme-challenge',
-      vhost          => $name,
+      server         => $name,
       location_alias => $::letsencrypt::www_root,
       ssl            => true,
     }

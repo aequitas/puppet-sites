@@ -32,7 +32,7 @@ define sites::vhosts::proxy (
     members => [$proxy]
   }
 
-  Nginx::Resource::Vhost {
+  Nginx::Resource::Server {
     proxy => "http://${proxy}",
   }
 

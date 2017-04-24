@@ -104,7 +104,7 @@ define sites::apps::wordpress (
 
   # disable caching and provide ACL for /wp-admin
   nginx::resource::location { "${name}-wp-admin":
-    vhost          => $name,
+    server         => $name,
     priority       => 450,
     ssl            => $ssl,
     www_root       => $webroot,
@@ -114,7 +114,7 @@ define sites::apps::wordpress (
   }
   # disable caching and provide ACL for /wp-admin
   nginx::resource::location { "${name}-wp-admin-php":
-    vhost          => $name,
+    server         => $name,
     priority       => 450,
     ssl            => $ssl,
     www_root       => $webroot,

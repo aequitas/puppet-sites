@@ -35,7 +35,7 @@ define sites::vhosts::php (
       group  => www-data;
   }
 
-  Nginx::Resource::Vhost {
+  Nginx::Resource::Server {
     www_root    => $webroot,
   }
 
@@ -61,7 +61,7 @@ define sites::vhosts::php (
   }
 
   nginx::resource::location { "${name}-php":
-    vhost               => $name,
+    server              => $name,
     ssl                 => $ssl,
     www_root            => $webroot,
     location            => '~ \.php$',
@@ -79,7 +79,7 @@ define sites::vhosts::php (
 
   # cache static files a lot
   nginx::resource::location { "${name}-static-cache":
-    vhost               => $name,
+    server              => $name,
     ssl                 => $ssl,
     www_root            => $webroot,
     location            => '~* \.(?:ico|css|js|gif|jpe?g|png)$',

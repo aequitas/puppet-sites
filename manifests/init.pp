@@ -60,8 +60,7 @@ class sites (
   }
 
   # nginx
-  Anchor['nginx::begin'] ->
-  class {'nginx::config':
+  class {'nginx':
     # global caching settings
     fastcgi_cache_path      => "${root}/cache/",
     fastcgi_cache_key       => '"$scheme$request_method$host$request_uri"',
@@ -77,11 +76,6 @@ class sites (
       cache => '$remote_addr - $upstream_cache_status [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent',
     },
   }
-  class {'nginx': }
-
-  # bugfix: https://github.com/jfryman/puppet-nginx/issues/610
-  Class['::nginx::config'] -> Nginx::Resource::Vhost <| |>
-  Class['::nginx::config'] -> Nginx::Resource::Upstream <| |>
 
   file {
     $root:
