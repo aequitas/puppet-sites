@@ -59,6 +59,7 @@ define sites::vhosts::webroot (
   nginx::resource::location { "${name}-php":
     server        => $name,
     ssl           => $ssl,
+    ssl_only      => $rewrite_to_https,
     www_root      => $webroot,
     location      => '~ \.php$',
     location_deny => ['all'],
@@ -68,6 +69,7 @@ define sites::vhosts::webroot (
   nginx::resource::location { "${name}-static_cache":
     server              => $name,
     ssl                 => $ssl,
+    ssl_only            => $rewrite_to_https,
     www_root            => $webroot,
     location            => '~* \.(?:ico|css|js|gif|jpe?g|png)$',
     location_cfg_append => {

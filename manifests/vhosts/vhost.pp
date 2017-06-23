@@ -101,10 +101,10 @@ define sites::vhosts::vhost (
         "Class C no-www compliance specified, but a wwww. domain in subdomains: ${validate_domains}.")
   }
 
-  $_vhost_cfg_append = merge({
+  $vhost_cfg_cache = {
     'expires'    => $expires,
     'access_log' => "/var/log/nginx/${server_name}.cache.log cache",
-  }, $vhost_cfg_append)
+  }
 
   file {
     $root:
@@ -113,21 +113,61 @@ define sites::vhosts::vhost (
       group  => www-data;
   } ->
   nginx::resource::server { $name:
-    server_name            => $listen_domains,
-    listen_options         => $listen_options,
-    ipv6_listen_options    => $ipv6_listen_options,
-    ipv6_enable            => true,
-    ssl                    => $ssl,
-    ssl_key                => $keyfile,
-    ssl_cert               => $certfile,
-    ssl_ciphers            => $ssl_ciphers,
-    ssl_dhparam            => $ssl_dhparam,
-    ssl_redirect           => $rewrite_to_https,
-    rewrite_www_to_non_www => $rewrite_www_to_non_www,
-    location_allow         => $location_allow,
-    location_deny          => $location_deny,
-    server_cfg_append      => $_vhost_cfg_append,
-    add_header             => $ssl_headers,
+    server_name         => $listen_domains,
+    listen_options      => $listen_options,
+    ipv6_listen_options => $ipv6_listen_options,
+    ipv6_enable         => true,
+    ssl                 => $ssl,
+    ssl_key             => $keyfile,
+    ssl_cert            => $certfile,
+    ssl_ciphers         => $ssl_ciphers,
+    ssl_dhparam         => $ssl_dhparam,
+    location_allow      => $location_allow,
+    location_deny       => $location_deny,
+    server_cfg_append   => merge(
+      $vhost_cfg_cache,
+      $vhost_cfg_append
+    ),
+    add_header          => $ssl_headers,
+  }
+
+  # redirect to https but allow .well-known undirected to not break LE.
+  # overrides default location to redirect to https
+  if $rewrite_to_https {
+    nginx::resource::location { "${name}-ssl-redirect":
+      ensure              => present,
+      server              => $name,
+      location            => '~* /.*',
+      ssl                 => false,
+      location_custom_cfg => {
+        return => '301 https://$server_name$request_uri',
+      }
+    }
+  }
+
+  # redirect to non-www but allow .well-known undirected to not break LE.
+  if $rewrite_www_to_non_www {
+    nginx::resource::server { "www-${name}":
+      server_name         => prefix($listen_domains, 'www.'),
+      listen_options      => $listen_options,
+      ipv6_listen_options => $ipv6_listen_options,
+      ipv6_enable         => true,
+      ssl                 => $ssl,
+      ssl_key             => $keyfile,
+      ssl_cert            => $certfile,
+      ssl_ciphers         => $ssl_ciphers,
+      ssl_dhparam         => $ssl_dhparam,
+      location_allow      => $location_allow,
+      location_deny       => $location_deny,
+      server_cfg_append   => merge(
+        $vhost_cfg_cache,
+        $vhost_cfg_append
+      ),
+      add_header          => $ssl_headers,
+      location_custom_cfg => {
+        return => "301 http://${name}\$request_uri",
+      }
+    }
   }
 
   # configure letsencrypt
@@ -136,10 +176,18 @@ define sites::vhosts::vhost (
       subdomains => $le_subdomains,
     }
     nginx::resource::location { "letsencrypt_${name}":
-      location       => '/.well-known/acme-challenge',
+      location       => '^~ /.well-known/acme-challenge',
       server         => $name,
       location_alias => $::letsencrypt::www_root,
-      ssl            => true,
+      priority       => 401,
+    }
+    if $rewrite_www_to_non_www {
+      nginx::resource::location { "letsencrypt_www-${name}":
+        location       => '^~ /.well-known/acme-challenge',
+        server         => "www-${name}",
+        location_alias => $::letsencrypt::www_root,
+        priority       => 401,
+      }
     }
   }
 }
