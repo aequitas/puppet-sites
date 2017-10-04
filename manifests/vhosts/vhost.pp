@@ -25,6 +25,7 @@ define sites::vhosts::vhost (
   # paths
   $root="${::sites::root}/${name}/",
   $vhost_cfg_append={},
+  $clacks_overhead=true,
 ){
   validate_re($nowww_compliance, '^class_[abc]$')
 
@@ -101,6 +102,14 @@ define sites::vhosts::vhost (
         "Class C no-www compliance specified, but a wwww. domain in subdomains: ${validate_domains}.")
   }
 
+  if $clacks_overhead {
+    $clacks_headers = {
+      'X-Clacks-Overhead' => 'GNU Terry Pratchett',
+    }
+  } else {
+    $clacks_headers = {}
+  }
+
   $vhost_cfg_cache = {
     'expires'    => $expires,
     'access_log' => "/var/log/nginx/${server_name}.cache.log cache",
@@ -128,7 +137,7 @@ define sites::vhosts::vhost (
       $vhost_cfg_cache,
       $vhost_cfg_append
     ),
-    add_header          => $ssl_headers,
+    add_header          => merge($ssl_headers, $clacks_headers),
   }
 
   # redirect to https but allow .well-known undirected to not break LE.
@@ -163,7 +172,7 @@ define sites::vhosts::vhost (
         $vhost_cfg_cache,
         $vhost_cfg_append
       ),
-      add_header          => $ssl_headers,
+      add_header          => merge($ssl_headers, $clacks_headers),
       location_custom_cfg => {
         return => "301 http://${name}\$request_uri",
       }
