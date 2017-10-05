@@ -6,9 +6,7 @@ class sites (
 
   ## db related
   $manage_mysql=true,
-  $mysql_root_pw=undef,
-  $mysql_backup_pw=undef,
-  $mysql_backuprotate=undef,
+  $mysql_backuprotate=2,
   $pma=false,
   $pma_allow=[],
 
@@ -84,18 +82,22 @@ class sites (
       ensure => directory,
   }
 
+  $random_seed = file('/var/lib/puppet/.random_seed')
+
   # dbs
   if $manage_mysql {
     class { '::mysql::server':
-        root_password           => $mysql_root_pw,
-        remove_default_accounts => true,
+      # a random password is generated for mysql root (and backup)
+      # to login as mysql root use `mysql` as root user or sudo `sudo -i mysql`
+      root_password           => fqdn_rand_string(32, '', "${random_seed}mysql_root"),
+      remove_default_accounts => true,
     }
     class { '::mysql::server::backup':
-        backupuser        => backup,
-        backuppassword    => $mysql_backup_pw,
-        backupdir         => '/var/backups/mysql/',
-        file_per_database => true,
-        backuprotate      => $mysql_backuprotate,
+      backupuser        => backup,
+      backuppassword    => fqdn_rand_string(32, '', "${random_seed}mysql_backup"),
+      backupdir         => '/var/backups/mysql/',
+      file_per_database => true,
+      backuprotate      => $mysql_backuprotate,
     }
   }
 

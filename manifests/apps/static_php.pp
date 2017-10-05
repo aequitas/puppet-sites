@@ -15,6 +15,7 @@ define sites::apps::static_php (
   $mysql_db_password=$title,
   $mysql_db_host=localhost,
   $mysql_db_init_filename=undef,
+  $mysql_access=write,
 
   # manage vhost
   $vhost=true,
@@ -51,19 +52,33 @@ define sites::apps::static_php (
     } ~> Exec["${title} generate"]
   }
 
+  # configure mysql permissions based on access level
+  $mysql_grant = $mysql_access ? {
+    write => ['SELECT', 'UPDATE', 'INSERT', 'DELETE'],
+    read  => ['SELECT'],
+  }
+
   if $mysql_manage_db {
     if $mysql_db_init_filename {
       $schema = "${root}/${mysql_db_init_filename}"
     } else {
       $schema = "/var/backups/mysql/${title}.sql"
     }
+
     mysql::db { $mysql_db_name:
       user     => $mysql_db_user,
       password => $mysql_db_password,
       host     => $mysql_db_host,
-      grant    => ['SELECT', 'UPDATE', 'INSERT', 'DELETE'],
+      grant    => $mysql_grant,
       sql      => $schema,
     } -> Exec["${title} generate"]
+  } else {
+    mysql_user { "${mysql_db_user}@${mysql_db_host}":
+      password => $mysql_db_password,
+    }
+    mysql_grant { "${mysql_db_user}@${mysql_db_host}":
+      privileges => $mysql_grant,
+    }
   }
 
   file { "${root}/generate.sh":
