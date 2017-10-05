@@ -174,7 +174,7 @@ define sites::vhosts::vhost (
       ),
       add_header          => merge($ssl_headers, $clacks_headers),
       location_custom_cfg => {
-        return => "301 http://${name}\$request_uri",
+        return => "301 $scheme://${name}\$request_uri",
       }
     }
   }
