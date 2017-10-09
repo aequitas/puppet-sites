@@ -18,6 +18,9 @@ class sites (
   $root='/var/www',
   $dh_keysize=2048,
 
+  # optional DNS resolver(s) to be used for proxy lookups
+  $resolver=undef,
+
   ## resource hashes for hiera
   $apps_static_php={},
   $apps_wordpress={},

@@ -26,6 +26,9 @@ define sites::vhosts::vhost (
   $root="${::sites::root}/${name}/",
   $vhost_cfg_append={},
   $clacks_overhead=true,
+  $proxy=undef,
+  $resolver=undef,
+  $location_cfg_append=undef,
 ){
   validate_re($nowww_compliance, '^class_[abc]$')
 
@@ -138,6 +141,9 @@ define sites::vhosts::vhost (
       $vhost_cfg_append
     ),
     add_header          => merge($ssl_headers, $clacks_headers),
+    proxy               => $proxy,
+    resolver            => $resolver,
+    location_cfg_append => $location_cfg_append,
   }
 
   # redirect to https but allow .well-known undirected to not break LE.
@@ -175,7 +181,10 @@ define sites::vhosts::vhost (
       add_header          => merge($ssl_headers, $clacks_headers),
       location_custom_cfg => {
         return => "301 \$scheme://${name}\$request_uri",
-      }
+      },
+      proxy               => $proxy,
+      resolver            => $resolver,
+      location_cfg_append => $location_cfg_append,
     }
   }
 
