@@ -28,6 +28,8 @@ define sites::vhosts::proxy (
   # paths
   $root="${::sites::root}/${name}/",
   $resolver=$::sites::resolver,
+  # optional unproxied path to webroot for static files
+  $webroot=undef,
 ){
   vhost { $name:
     domain              => $domain,
@@ -52,5 +54,18 @@ define sites::vhosts::proxy (
     location_cfg_append => {
       'set $backend' => "http://${proxy}",
     },
+  }
+
+  if $webroot {
+    nginx::resource::location { "${name}-static_cache":
+      server              => $name,
+      ssl                 => $ssl,
+      ssl_only            => $rewrite_to_https,
+      www_root            => $webroot,
+      location            => '~* \.(?:ico|css|js|gif|jpe?g|png)$',
+      location_cfg_append => {
+        'expires' => $static_expires,
+      },
+    }
   }
 }
