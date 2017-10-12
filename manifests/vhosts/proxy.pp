@@ -30,6 +30,8 @@ define sites::vhosts::proxy (
   $resolver=$::sites::resolver,
   # optional unproxied path to webroot for static files
   $webroot=undef,
+  # configure client certificate authentication using this CA
+  $client_ca=undef,
 ){
   vhost { $name:
     domain              => $domain,
@@ -54,6 +56,7 @@ define sites::vhosts::proxy (
     location_cfg_append => {
       'set $backend' => "http://${proxy}",
     },
+    client_ca           => $client_ca,
   }
 
   if $webroot {
