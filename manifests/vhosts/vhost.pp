@@ -29,6 +29,8 @@ define sites::vhosts::vhost (
   $proxy=undef,
   $resolver=undef,
   $location_cfg_append=undef,
+  # configure client certificate authentication using this CA
+  $client_ca=undef,
 ){
   validate_re($nowww_compliance, '^class_[abc]$')
 
@@ -113,6 +115,14 @@ define sites::vhosts::vhost (
     $clacks_headers = {}
   }
 
+  if $client_ca {
+    file { "/etc/ssl/certs/nginx-client-ca-${name}.pem":
+      content => $client_ca,
+    }
+    $ssl_client_cert = "/etc/ssl/certs/nginx-client-ca-${name}.pem"
+    $ssl_verify_client = on
+  }
+
   $vhost_cfg_cache = {
     'expires'    => $expires,
     'access_log' => "/var/log/nginx/${server_name}.cache.log cache",
@@ -144,6 +154,9 @@ define sites::vhosts::vhost (
     proxy               => $proxy,
     resolver            => $resolver,
     location_cfg_append => $location_cfg_append,
+    # ssl client certificate verification
+    ssl_client_cert     => $ssl_client_cert,
+    ssl_verify_client   => $ssl_verify_client,
   }
 
   # redirect to https but allow .well-known undirected to not break LE.
@@ -185,6 +198,9 @@ define sites::vhosts::vhost (
       proxy               => $proxy,
       resolver            => $resolver,
       location_cfg_append => $location_cfg_append,
+      # ssl client certificate verification
+      ssl_client_cert     => $ssl_client_cert,
+      ssl_verify_client   => $ssl_verify_client,
     }
   }
 
