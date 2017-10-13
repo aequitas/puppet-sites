@@ -31,6 +31,8 @@ define sites::vhosts::vhost (
   $location_cfg_append=undef,
   # configure client certificate authentication using this CA
   $client_ca=undef,
+  # abstract cache configurations
+  $caching=undef,
 ){
   validate_re($nowww_compliance, '^class_[abc]$')
 
@@ -123,9 +125,41 @@ define sites::vhosts::vhost (
     $ssl_verify_client = on
   }
 
-  $vhost_cfg_cache = {
-    'expires'    => $expires,
-    'access_log' => "/var/log/nginx/${server_name}.cache.log cache",
+  case $caching {
+    # expect upstream (php, uwsgi, proxy) to provide caching headers
+    # provide default caching if upstream does not provide one
+    # cache upstream responses in webserver
+    # server stale content from cache if upstream is unavailable
+    upstream: {
+      $vhost_cfg_cache = {
+        # return stale content for all problems with backend
+        proxy_cache_use_stale => 'error timeout invalid_header updating http_500 http_502 http_503 http_504 http_429',
+        access_log            => "/var/log/nginx/${server_name}.cache.log cache",
+        expires               => "\$default_expires",
+
+      }
+      # https://stackoverflow.com/a/41362362
+      nginx::resource::map { 'default_expires':
+        string   => "\$upstream_http_cache_control",
+        mappings => {
+          "''" => $expires,
+        }
+      }
+    }
+    # disable all caching except static files, also prevent upstream cache headers from propagating
+    disabled: {
+      $vhost_cfg_cache = {
+        proxy_ignore_headers => 'Expires Cache-Control',
+        expires              => -1,
+      }
+    }
+    # use old cache configuration if caching method is not defined
+    default: {
+      $vhost_cfg_cache = {
+        expires    => $expires,
+        access_log => "/var/log/nginx/${server_name}.cache.log cache",
+      }
+    }
   }
 
   file {

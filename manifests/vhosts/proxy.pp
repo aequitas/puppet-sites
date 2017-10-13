@@ -32,6 +32,7 @@ define sites::vhosts::proxy (
   $webroot=undef,
   # configure client certificate authentication using this CA
   $client_ca=undef,
+  $caching=undef
 ){
   vhost { $name:
     domain              => $domain,
@@ -57,6 +58,7 @@ define sites::vhosts::proxy (
       'set $backend' => "http://${proxy}",
     },
     client_ca           => $client_ca,
+    caching             => $caching
   }
 
   if $webroot {
