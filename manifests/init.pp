@@ -62,6 +62,7 @@ class sites (
 
   # nginx
   class {'nginx':
+    package_ensure          => latest,
     # global caching settings
     fastcgi_cache_path      => "${root}/cache/",
     fastcgi_cache_key       => '"$scheme$request_method$host$request_uri"',
