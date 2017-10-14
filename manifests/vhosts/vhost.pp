@@ -155,7 +155,7 @@ define sites::vhosts::vhost (
       # setup a cache configuration with 10MB memory store, 1GB disk cache
       file { "/etc/nginx/conf.d/${server_name}.cache.conf":
         ensure  => present,
-        content => "proxy_cache_path /var/cache/nginx/${server_name}/ \
+        content => "proxy_cache_path /var/cache/nginx/${server_name}/ inactive=14d \
                     levels=1:2 keys_zone=${server_name}:10m max_size=1g use_temp_path=off;"
       } -> Nginx::Resource::Server[$name]
     }
