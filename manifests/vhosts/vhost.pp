@@ -33,6 +33,7 @@ define sites::vhosts::vhost (
   $client_ca=undef,
   # abstract cache configurations
   $caching=undef,
+  $proxy_timeout=10s,
 ){
   validate_re($nowww_compliance, '^class_[abc]$')
 
@@ -136,6 +137,12 @@ define sites::vhosts::vhost (
         proxy_cache_use_stale => 'error timeout invalid_header updating http_500 http_502 http_503 http_504 http_429',
         access_log            => "/var/log/nginx/${server_name}.cache.log cache",
         expires               => "\$default_expires",
+        # enable caching
+        proxy_cache           => $server_name,
+        proxy_read_timeout    => $proxy_timeout,
+        # caching doesn't pick up on the map hack to set default cache headers if none are provided upstream
+        # use this setting to fallback on the configured default cache time
+        proxy_cache_valid     => "200 302 ${expires}",
 
       }
       # https://stackoverflow.com/a/41362362
@@ -145,6 +152,12 @@ define sites::vhosts::vhost (
           "''" => $expires,
         }
       }
+      # setup a cache configuration with 10MB memory store, 1GB disk cache
+      file { "/etc/nginx/conf.d/${server_name}.cache.conf":
+        ensure  => present,
+        content => "proxy_cache_path /var/cache/nginx/${server_name}/ \
+                    levels=1:2 keys_zone=${server_name}:10m max_size=1g use_temp_path=off;"
+      } -> Nginx::Resource::Server[$name]
     }
     # disable all caching except static files, also prevent upstream cache headers from propagating
     disabled: {
