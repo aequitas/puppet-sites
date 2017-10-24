@@ -175,6 +175,10 @@ define sites::vhosts::vhost (
     }
   }
 
+  $security_headers = {
+    'X-XSS-Protection' => '1; mode=block'
+  }
+
   file {
     $root:
       ensure => directory,
@@ -197,7 +201,7 @@ define sites::vhosts::vhost (
       $vhost_cfg_cache,
       $vhost_cfg_append
     ),
-    add_header          => merge($ssl_headers, $clacks_headers),
+    add_header          => merge($ssl_headers, $security_headers, $clacks_headers),
     proxy               => $proxy,
     resolver            => $resolver,
     location_cfg_append => $location_cfg_append,
@@ -238,7 +242,7 @@ define sites::vhosts::vhost (
         $vhost_cfg_cache,
         $vhost_cfg_append
       ),
-      add_header          => merge($ssl_headers, $clacks_headers),
+      add_header          => merge($ssl_headers, $security_headers, $clacks_headers),
       location_custom_cfg => {
         return => "301 \$scheme://${name}\$request_uri",
       },
