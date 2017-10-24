@@ -271,4 +271,8 @@ define sites::vhosts::vhost (
       }
     }
   }
+
+  monitoring {$name:
+    server_name => $server_name,
+  }
 }
