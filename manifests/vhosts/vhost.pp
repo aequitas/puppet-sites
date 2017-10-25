@@ -134,7 +134,7 @@ define sites::vhosts::vhost (
     upstream: {
       $vhost_cfg_cache = {
         # return stale content for all problems with backend
-        proxy_cache_use_stale => 'error timeout invalid_header updating http_500 http_502 http_503 http_504 http_429',
+        proxy_cache_use_stale => 'error timeout invalid_header updating http_404 http_500 http_502 http_503 http_504 http_429',
         access_log            => "/var/log/nginx/${server_name}.cache.log cache",
         expires               => "\$default_expires",
         # enable caching
