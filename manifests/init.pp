@@ -80,6 +80,7 @@ class sites (
     # enable compression on all responses
     gzip_proxied            => any,
     gzip_types              => '*',
+    gzip_vary               => on,
     # enable http/2 support
     http2                   => on,
   }
