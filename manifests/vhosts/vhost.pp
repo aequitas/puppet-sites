@@ -147,7 +147,7 @@ define sites::vhosts::vhost (
       }
       # https://stackoverflow.com/a/41362362
       nginx::resource::map { 'default_expires':
-        string   => "\$upstream_http_cache_control",
+        string   => "\$upstream_http_expires",
         mappings => {
           "''" => $expires,
         }
