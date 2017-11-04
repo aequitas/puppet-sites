@@ -41,7 +41,10 @@ define sites::vhosts::vhost (
     $server_name = '_'
     $letsencrypt_name = $realm
 
-    $realm_name = $realm
+    # only include a realm domain for this vhost if responing on defaulthost
+    if $::sites::default_host {
+      $realm_name = $realm
+    }
 
     $listen_options = 'default_server'
     $ipv6_listen_options = 'default_server'
@@ -51,8 +54,11 @@ define sites::vhosts::vhost (
     $server_name = $name
     $letsencrypt_name = $server_name
 
-    $realm_host = regsubst($server_name, '\.', '-')
-    $realm_name = "${realm_host}.${realm}"
+    # only include a realm domain for this vhost if responing on defaulthost
+    if $::sites::default_host {
+      $realm_host = regsubst($server_name, '\.', '-')
+      $realm_name = "${realm_host}.${realm}"
+    }
 
     $listen_options = ''
     $ipv6_listen_options = ''
