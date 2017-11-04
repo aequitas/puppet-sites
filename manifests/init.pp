@@ -86,6 +86,9 @@ class sites (
     gzip_vary               => on,
     # enable http/2 support
     http2                   => on,
+    # remove unmanaged resources
+    server_purge            => true,
+    confd_purge             => true,
   }
 
   file {
