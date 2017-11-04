@@ -10,7 +10,7 @@ define sites::vhosts::proxy (
   $default_vhost=false,
   # additional subdomains (no www.)
   $subdomains=[],
-  # http://no-www.org/index.php
+  # http://web.archive.org/web/20101230024259/http://no-www.org:80/index.php
   $nowww_compliance='class_b',
   # connection settings
   $ipv6=true,

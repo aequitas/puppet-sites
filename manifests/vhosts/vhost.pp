@@ -7,7 +7,7 @@ define sites::vhosts::vhost (
   $default_vhost=false,
   # additional subdomains (no www.)
   $subdomains=[],
-  # http://no-www.org/index.php
+  # http://web.archive.org/web/20101230024259/http://no-www.org:80/index.php
   $nowww_compliance='class_b',
   # connection settings
   $ipv6=true,
@@ -76,7 +76,7 @@ define sites::vhosts::vhost (
   $server_names = concat([], $server_name, $subdomains, $realm_name)
 
   # configure non-www compliancy
-  # http://no-www.org/faq.php
+  # http://web.archive.org/web/20101230024259/http://no-www.org:80/faq.php
   # www point to the same content as non-www domains
   if $nowww_compliance == 'class_a' {
     $rewrite_www_to_non_www = false
