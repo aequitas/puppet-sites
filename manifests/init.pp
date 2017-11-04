@@ -27,6 +27,9 @@ class sites (
 
   $vhost_webroot={},
   $vhost_proxy={},
+
+  # whether to respond to any other requests other then for explicitly declared vhosts
+  $default_host=false,
 ){
   # TODO include php module in every php subresource
 
@@ -111,14 +114,22 @@ class sites (
     }
   }
 
-  # default realm vhost
-  sites::vhosts::webroot {$realm:
+  if $default_host {
+    # default realm vhost
+    sites::vhosts::vhost {$realm:
+        default_vhost    => true,
+        nowww_compliance => 'class_c',
+        rewrite_to_https => false,
+    }
+    file { "/var/www/${realm}/html/index.html":
+      content => $default_vhost_content,
+    }
+  } else {
+    # deny requests on default vhost with an empty response
+    sites::vhosts::disabled {$realm:
       default_vhost    => true,
       nowww_compliance => 'class_c',
-      rewrite_to_https => false,
-  }
-  file { "/var/www/${realm}/html/index.html":
-    content => $default_vhost_content,
+    }
   }
 
   if $pma {
