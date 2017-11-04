@@ -69,8 +69,6 @@ define sites::vhosts::vhost (
     $keyfile = "${::letsencrypt::cert_root}/${letsencrypt_name}/privkey.pem"
     $ssl_headers = {
       'Strict-Transport-Security' => 'max-age=31536000; includeSubdomains',
-      'X-Frame-Options'           => 'DENY',
-      'X-Content-Type-Options'    => nosniff,
     }
   } else {
     $certfile = undef
@@ -182,8 +180,21 @@ define sites::vhosts::vhost (
   }
 
   $security_headers = {
-    'X-XSS-Protection' => '1; mode=block'
+    # prevent browser from rendering page if it detects XSS attack
+    'X-XSS-Protection' => '1; mode=block',
+    # tell browser to deny any form of framing
+    'X-Frame-Options'           => 'DENY',
+    # do not execute css/js if content-type is not valid
+    'X-Content-Type-Options'    => nosniff,
   }
+
+  # convert headers into list of add_header statements as puppet-nginx==6 doesn't support
+  # adding the 'always' argument
+  $headers_cfg_append = suffix(prefix(
+    join_keys_to_values(
+      merge($ssl_headers, $security_headers, $clacks_headers), "' '"),
+        "add_header '"),
+          "' always;")
 
   file {
     $root:
@@ -207,7 +218,7 @@ define sites::vhosts::vhost (
       $vhost_cfg_cache,
       $vhost_cfg_append
     ),
-    add_header          => merge($ssl_headers, $security_headers, $clacks_headers),
+    raw_append          => $headers_cfg_append,
     proxy               => $proxy,
     resolver            => $resolver,
     location_cfg_append => $location_cfg_append,
@@ -248,7 +259,7 @@ define sites::vhosts::vhost (
         $vhost_cfg_cache,
         $vhost_cfg_append
       ),
-      add_header          => merge($ssl_headers, $security_headers, $clacks_headers),
+      raw_append          => $headers_cfg_append,
       location_custom_cfg => {
         return => "301 \$scheme://${name}\$request_uri",
       },
