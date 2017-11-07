@@ -183,7 +183,7 @@ define sites::vhosts::vhost (
     # prevent browser from rendering page if it detects XSS attack
     'X-XSS-Protection' => '1; mode=block',
     # tell browser to deny any form of framing
-    'X-Frame-Options'           => 'DENY',
+    'X-Frame-Options'           => 'SAMEORIGIN',
     # do not execute css/js if content-type is not valid
     'X-Content-Type-Options'    => nosniff,
   }
@@ -225,6 +225,12 @@ define sites::vhosts::vhost (
     # ssl client certificate verification
     ssl_client_cert     => $ssl_client_cert,
     ssl_verify_client   => $ssl_verify_client,
+    # ignore security headers from upstream and enforce on webserver level
+    proxy_hide_header   => [
+      'X-Frame-Options',
+      'X-Content-Type-Options',
+      'X-XSS-Protection'
+    ],
   }
 
   # redirect to https but allow .well-known undirected to not break LE.
