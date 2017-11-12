@@ -138,15 +138,18 @@ define sites::vhosts::vhost (
     upstream: {
       $vhost_cfg_cache = {
         # return stale content for all problems with backend
-        proxy_cache_use_stale => 'error timeout invalid_header updating http_404 http_500 http_502 http_503 http_504 http_429',
-        access_log            => "/var/log/nginx/${server_name}.cache.log cache",
-        expires               => "\$default_expires",
+        proxy_cache_use_stale         => 'error timeout invalid_header updating http_404 http_500 http_502 http_503 http_504 http_429',
+        proxy_cache_background_update => on,
+        # log cache performance to separate log (hit, miss, expired, stale, etc)
+        access_log                    => "/var/log/nginx/${server_name}.cache.log cache",
+        # set upstream or fallback on default expiry header
+        expires                       => "\$default_expires",
         # enable caching
-        proxy_cache           => $server_name,
-        proxy_read_timeout    => $proxy_timeout,
+        proxy_cache                   => $server_name,
+        proxy_read_timeout            => $proxy_timeout,
         # caching doesn't pick up on the map hack to set default cache headers if none are provided upstream
         # use this setting to fallback on the configured default cache time
-        proxy_cache_valid     => "200 302 ${expires}",
+        proxy_cache_valid             => "200 302 ${expires}",
 
       }
       # https://stackoverflow.com/a/41362362
