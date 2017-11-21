@@ -115,6 +115,18 @@ class sites (
       file_per_database => true,
       backuprotate      => $mysql_backuprotate,
     }
+
+    # generate timezone information and load into mysql
+    package {'tzdata': } ->
+    Class['mysql::server'] ->
+    exec { 'generate mysql timezone info sql':
+      command => '/usr/bin/mysql_tzinfo_to_sql /usr/share/zoneinfo > /var/lib/mysql/tzinfo.sql',
+      creates => '/var/lib/mysql/tzinfo.sql',
+    } ~>
+    exec { 'import mysql timezone info sql':
+      command     => '/usr/bin/mysql  --defaults-file=/root/.my.cnf mysql < /var/lib/mysql/tzinfo.sql',
+      refreshonly => true,
+    }
   }
 
   if $default_host {
