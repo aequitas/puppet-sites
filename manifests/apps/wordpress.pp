@@ -32,6 +32,10 @@ define sites::apps::wordpress (
   include ::sites::php::fpm
   include ::sites::vhosts::map
 
+  Nginx::Resource::Server {
+    index_files => ['/index.php'],
+  }
+
   if $mysql_manage_db {
     if $mysql_db_init_filename {
       $schema = "${root}/${mysql_db_init_filename}"
