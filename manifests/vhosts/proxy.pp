@@ -34,7 +34,7 @@ define sites::vhosts::proxy (
   $client_ca=undef,
   $caching=undef
 ){
-  vhost { $name:
+  sites::vhosts::vhost { $name:
     domain              => $domain,
     realm               => $realm,
     default_vhost       => $default_vhost,

@@ -39,7 +39,7 @@ define sites::vhosts::php (
     www_root    => $webroot,
   }
 
-  vhost { $name:
+  sites::vhosts::vhost { $name:
     domain           => $domain,
     realm            => $realm,
     default_vhost    => $default_vhost,

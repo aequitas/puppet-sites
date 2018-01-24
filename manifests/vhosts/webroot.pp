@@ -38,7 +38,7 @@ define sites::vhosts::webroot (
     index_files => ['index.html', 'index.htm'],
   }
 
-  vhost { $name:
+  sites::vhosts::vhost { $name:
     domain           => $domain,
     realm            => $realm,
     default_vhost    => $default_vhost,

@@ -33,7 +33,7 @@ define sites::vhosts::vhost (
   $client_ca=undef,
   # abstract cache configurations
   $caching=undef,
-  $proxy_timeout=10s,
+  $proxy_timeout='10s',
 ){
   validate_re($nowww_compliance, '^class_[abc]$')
 
@@ -302,7 +302,7 @@ define sites::vhosts::vhost (
     }
   }
 
-  monitoring {$name:
+  sites::vhosts::monitoring {$name:
     server_name => $server_name,
   }
 }
