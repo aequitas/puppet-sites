@@ -58,6 +58,8 @@ define sites::vhosts::vhost (
     if $::sites::default_host {
       $realm_host = regsubst($server_name, '\.', '-')
       $realm_name = "${realm_host}.${realm}"
+    } else {
+      $realm_name = undef
     }
 
     $listen_options = ''
@@ -128,6 +130,9 @@ define sites::vhosts::vhost (
     }
     $ssl_client_cert = "/etc/ssl/certs/nginx-client-ca-${name}.pem"
     $ssl_verify_client = on
+  } else {
+    $ssl_client_cert = undef
+    $ssl_verify_client = undef
   }
 
   case $caching {
