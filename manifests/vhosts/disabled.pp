@@ -92,18 +92,19 @@ define sites::vhosts::disabled (
   }
 
   nginx::resource::server { $name:
-    server_name         => concat($listen_domains, prefix($listen_domains, 'www.')),
-    listen_options      => $listen_options,
-    ipv6_listen_options => $ipv6_listen_options,
-    ipv6_enable         => true,
-    ssl                 => $ssl,
-    ssl_key             => $keyfile,
-    ssl_cert            => $certfile,
-    ssl_ciphers         => $ssl_ciphers,
-    ssl_dhparam         => $ssl_dhparam,
-    server_cfg_append   => {
-      'return' => '444',
-    },
+    server_name                 => concat($listen_domains, prefix($listen_domains, 'www.')),
+    listen_options              => $listen_options,
+    ipv6_listen_options         => $ipv6_listen_options,
+    ipv6_enable                 => true,
+    ssl                         => $ssl,
+    ssl_key                     => $keyfile,
+    ssl_cert                    => $certfile,
+    ssl_ciphers                 => $ssl_ciphers,
+    ssl_dhparam                 => $ssl_dhparam,
+    # return empty response on default location
+    location_custom_cfg_prepend => {
+      'return' => '444;',
+    }
   }
 
   # configure letsencrypt
