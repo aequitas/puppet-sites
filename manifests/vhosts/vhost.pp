@@ -141,7 +141,6 @@ define sites::vhosts::vhost (
     # cache upstream responses in webserver
     # server stale content from cache if upstream is unavailable
     upstream: {
-      $proxy_read_timeout = $proxy_timeout
       $vhost_cfg_cache = {
         # return stale content for all problems with backend
         proxy_cache_use_stale         => 'error timeout invalid_header updating http_404 http_500 http_502 http_503 http_504 http_429',
@@ -152,7 +151,6 @@ define sites::vhosts::vhost (
         expires                       => "\$default_expires",
         # enable caching
         proxy_cache                   => $server_name,
-        proxy_read_timeout            => $proxy_timeout,
         # caching doesn't pick up on the map hack to set default cache headers if none are provided upstream
         # use this setting to fallback on the configured default cache time
         proxy_cache_valid             => "200 302 ${expires}",
@@ -174,7 +172,6 @@ define sites::vhosts::vhost (
     }
     # disable all caching except static files, also prevent upstream cache headers from propagating
     disabled: {
-      $proxy_read_timeout = undef
       $vhost_cfg_cache = {
         proxy_ignore_headers => 'Expires Cache-Control',
         expires              => -1,
@@ -182,7 +179,6 @@ define sites::vhosts::vhost (
     }
     # use old cache configuration if caching method is not defined
     default: {
-      $proxy_read_timeout = undef
       $vhost_cfg_cache = {
         expires    => $expires,
         access_log => "/var/log/nginx/${server_name}.cache.log cache",
@@ -214,35 +210,37 @@ define sites::vhosts::vhost (
       group  => www-data;
   }
   -> nginx::resource::server { $name:
-    server_name         => $listen_domains,
-    listen_options      => $listen_options,
-    ipv6_listen_options => $ipv6_listen_options,
-    ipv6_enable         => true,
-    ssl                 => $ssl,
-    ssl_key             => $keyfile,
-    ssl_cert            => $certfile,
-    ssl_ciphers         => $ssl_ciphers,
-    ssl_dhparam         => $ssl_dhparam,
-    location_allow      => $location_allow,
-    location_deny       => $location_deny,
-    server_cfg_append   => merge(
+    server_name           => $listen_domains,
+    listen_options        => $listen_options,
+    ipv6_listen_options   => $ipv6_listen_options,
+    ipv6_enable           => true,
+    ssl                   => $ssl,
+    ssl_key               => $keyfile,
+    ssl_cert              => $certfile,
+    ssl_ciphers           => $ssl_ciphers,
+    ssl_dhparam           => $ssl_dhparam,
+    location_allow        => $location_allow,
+    location_deny         => $location_deny,
+    server_cfg_append     => merge(
       $vhost_cfg_cache,
       $vhost_cfg_append
     ),
-    raw_append          => $headers_cfg_append,
-    proxy               => $proxy,
-    resolver            => $resolver,
-    location_cfg_append => $location_cfg_append,
+    raw_append            => $headers_cfg_append,
+    proxy                 => $proxy,
+    resolver              => $resolver,
+    location_cfg_append   => $location_cfg_append,
     # ssl client certificate verification
-    ssl_client_cert     => $ssl_client_cert,
-    ssl_verify_client   => $ssl_verify_client,
+    ssl_client_cert       => $ssl_client_cert,
+    ssl_verify_client     => $ssl_verify_client,
     # ignore security headers from upstream and enforce on webserver level
-    proxy_hide_header   => [
+    proxy_hide_header     => [
       'X-Frame-Options',
       'X-Content-Type-Options',
       'X-XSS-Protection'
     ],
-    proxy_read_timeout  => $proxy_read_timeout,
+    proxy_read_timeout    => $proxy_timeout,
+    proxy_connect_timeout => $proxy_timeout,
+    proxy_send_timeout    => $proxy_timeout,
   }
 
   # redirect to https but allow .well-known undirected to not break LE.
