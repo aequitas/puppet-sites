@@ -141,6 +141,7 @@ define sites::vhosts::vhost (
     # cache upstream responses in webserver
     # server stale content from cache if upstream is unavailable
     upstream: {
+      $proxy_read_timeout = $proxy_timeout
       $vhost_cfg_cache = {
         # return stale content for all problems with backend
         proxy_cache_use_stale         => 'error timeout invalid_header updating http_404 http_500 http_502 http_503 http_504 http_429',
@@ -173,6 +174,7 @@ define sites::vhosts::vhost (
     }
     # disable all caching except static files, also prevent upstream cache headers from propagating
     disabled: {
+      $proxy_read_timeout = undef
       $vhost_cfg_cache = {
         proxy_ignore_headers => 'Expires Cache-Control',
         expires              => -1,
@@ -180,6 +182,7 @@ define sites::vhosts::vhost (
     }
     # use old cache configuration if caching method is not defined
     default: {
+      $proxy_read_timeout = undef
       $vhost_cfg_cache = {
         expires    => $expires,
         access_log => "/var/log/nginx/${server_name}.cache.log cache",
@@ -209,8 +212,8 @@ define sites::vhosts::vhost (
       ensure => directory,
       owner  => www-data,
       group  => www-data;
-  } ->
-  nginx::resource::server { $name:
+  }
+  -> nginx::resource::server { $name:
     server_name         => $listen_domains,
     listen_options      => $listen_options,
     ipv6_listen_options => $ipv6_listen_options,
@@ -239,6 +242,7 @@ define sites::vhosts::vhost (
       'X-Content-Type-Options',
       'X-XSS-Protection'
     ],
+    proxy_read_timeout  => $proxy_read_timeout,
   }
 
   # redirect to https but allow .well-known undirected to not break LE.
