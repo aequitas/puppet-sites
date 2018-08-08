@@ -33,11 +33,11 @@ class sites (
 ){
   # TODO include php module in every php subresource
 
-  create_resources(apps::static_php, $apps_static_php, {})
-  create_resources(apps::wordpress, $apps_wordpress, {})
+  create_resources(sites::apps::static_php, $apps_static_php, {})
+  create_resources(sites::apps::wordpress, $apps_wordpress, {})
 
-  create_resources(vhosts::webroot, $vhost_webroot, {})
-  create_resources(vhosts::proxy, $vhost_proxy, {})
+  create_resources(sites::vhosts::webroot, $vhost_webroot, {})
+  create_resources(sites::vhosts::proxy, $vhost_proxy, {})
 
   # configure global letsencrypt if SSL is enabled
   if $ssl {
