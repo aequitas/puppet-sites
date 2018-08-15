@@ -67,7 +67,7 @@ class sites (
   class {'nginx':
     package_ensure          => latest,
     # global caching settings
-    fastcgi_cache_path      => "${root}/cache/",
+    fastcgi_cache_path      => "/var/cache/nginx/",
     fastcgi_cache_key       => '"$scheme$request_method$host$request_uri"',
     fastcgi_cache_keys_zone => 'default:250m',
     fastcgi_cache_max_size  => '500m',
@@ -94,8 +94,6 @@ class sites (
 
   file {
     $root:
-      ensure => directory;
-    "${root}/cache":
       ensure => directory;
     "/var/cache/nginx":
       ensure => directory;
