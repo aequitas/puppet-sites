@@ -1,4 +1,4 @@
-Gemfile.lock
 vendor/
+pkg/
+.bin
 .bundle
-pkg

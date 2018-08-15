@@ -1,11 +1,14 @@
-Gemfile.lock: Gemfile
+.DELETE_ON_ERROR:
+
+vendor/bundle: Gemfile.lock
 	bundle install --path vendor/bundle
+	@touch $@
 
 fix:
-	puppet-lint --fix manifests
+	bundle exec puppet-lint --fix manifests
 
-check test: Gemfile.lock
+check test: vendor/bundle
 	bundle exec rake validate
 
 clean:
-	rm -rf pkg Gemfile.lock vendor .bundle
+	rm -rf pkg vendor 

@@ -8,7 +8,8 @@ define sites::vhosts::vhost (
   # additional subdomains (no www.)
   $subdomains=[],
   # http://web.archive.org/web/20101230024259/http://no-www.org:80/index.php
-  $nowww_compliance='class_b',
+  Pattern[/^class_[abc]$/] 
+    $nowww_compliance='class_b',
   # connection settings
   $ipv6=true,
   # SSL settings
@@ -35,8 +36,6 @@ define sites::vhosts::vhost (
   $caching=undef,
   $proxy_timeout='10s',
 ){
-  validate_re($nowww_compliance, '^class_[abc]$')
-
   if $default_vhost {
     $server_name = '_'
     $letsencrypt_name = $realm
@@ -49,7 +48,9 @@ define sites::vhosts::vhost (
     $listen_options = 'default_server'
     $ipv6_listen_options = 'default_server'
 
-    validate_re($nowww_compliance, '^class_c$', 'realm must have Class C nowww compliance')
+    if $nowww_compliance !~ /^class_c$'/ {
+      fail('realm must have Class C nowww compliance')
+    }
   } else {
     $server_name = $name
     $letsencrypt_name = $server_name
@@ -91,8 +92,9 @@ define sites::vhosts::vhost (
     # listen to name, subdomains and all www. version of them
     $listen_domains = concat([], $server_name, $le_subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
-    validate_re($validate_domains, '^(?!.*www\.).*$',
-        "Class A no-www compliance specified, but www. domain specified in title or subdomains : ${validate_domains}.")
+    if $validate_domains !~ /^(?!.*www\.).*$/ {
+      fail("Class A no-www compliance specified, but www. domain specified in title or subdomains : ${validate_domains}.")
+    }
   }
   # www domains redirect to non-www domains
   if $nowww_compliance == 'class_b' {
@@ -102,8 +104,9 @@ define sites::vhosts::vhost (
     # www-redirect manages www names, only listen to name and subdomains
     $listen_domains = concat([], $server_name, $subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
-    validate_re($validate_domains, '^(?!.*www\.).*$',
-        "Class B no-www compliance specified, but www. domain specified in title or subdomains : ${validate_domains}.")
+    if $validate_domains !~ /^(?!.*www\.).*$/ {
+      fail("Class B no-www compliance specified, but www. domain specified in title or subdomains : ${validate_domains}.")
+    }
   }
   # www domains do not exist
   if $nowww_compliance == 'class_c' {
@@ -112,8 +115,9 @@ define sites::vhosts::vhost (
     # only listen to name and subdomains
     $listen_domains = concat([], $server_name, $subdomains, $realm_name)
     $validate_domains = join($server_names, ' ')
-    validate_re($validate_domains, '^(?!.*www\.).*$',
-        "Class C no-www compliance specified, but a wwww. domain in subdomains: ${validate_domains}.")
+    if $validate_domains !~ /^(?!.*www\.).*$/ {
+      fail("Class C no-www compliance specified, but a wwww. domain in subdomains: ${validate_domains}.")
+    }
   }
 
   if $clacks_overhead {
