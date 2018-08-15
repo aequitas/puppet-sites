@@ -96,7 +96,9 @@ class sites (
     $root:
       ensure => directory;
     "${root}/cache":
-      ensure => directory,
+      ensure => directory;
+    "/var/cache/nginx":
+      ensure => directory;
   }
 
   # dbs
