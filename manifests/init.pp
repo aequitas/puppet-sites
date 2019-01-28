@@ -129,20 +129,22 @@ class sites (
   }
 
   if $default_host {
-    # default realm vhost
-    sites::vhosts::vhost {$realm:
+    if $default_vhost_content {
+      # default realm vhost
+      sites::vhosts::vhost {$realm:
+          default_vhost    => true,
+          nowww_compliance => 'class_c',
+          rewrite_to_https => false,
+      }
+      file { "/var/www/${realm}/html/index.html":
+        content => $default_vhost_content,
+      }
+    } else {
+      # deny requests on default vhost with an empty response
+      sites::vhosts::disabled {$realm:
         default_vhost    => true,
         nowww_compliance => 'class_c',
-        rewrite_to_https => false,
-    }
-    file { "/var/www/${realm}/html/index.html":
-      content => $default_vhost_content,
-    }
-  } else {
-    # deny requests on default vhost with an empty response
-    sites::vhosts::disabled {$realm:
-      default_vhost    => true,
-      nowww_compliance => 'class_c',
+      }
     }
   }
 
