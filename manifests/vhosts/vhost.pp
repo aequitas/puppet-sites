@@ -8,7 +8,7 @@ define sites::vhosts::vhost (
   # additional subdomains (no www.)
   $subdomains=[],
   # http://web.archive.org/web/20101230024259/http://no-www.org:80/index.php
-  Pattern[/^class_[abc]$/] 
+  Pattern[/^class_[abc]$/]
     $nowww_compliance='class_b',
   # connection settings
   $ipv6=true,
@@ -32,6 +32,8 @@ define sites::vhosts::vhost (
   $location_cfg_append=undef,
   # configure client certificate authentication using this CA
   $client_ca=undef,
+  Optional[String] $auth_basic=undef,
+  Optional[String] $auth_basic_user_file=undef,
   # abstract cache configurations
   $caching=undef,
   $proxy_timeout='10s',
@@ -236,6 +238,9 @@ define sites::vhosts::vhost (
     # ssl client certificate verification
     ssl_client_cert       => $ssl_client_cert,
     ssl_verify_client     => $ssl_verify_client,
+    # basic auth
+    auth_basic          => $auth_basic,
+    auth_basic_user_file => $auth_basic_user_file,
     # ignore security headers from upstream and enforce on webserver level
     proxy_hide_header     => [
       'X-Frame-Options',

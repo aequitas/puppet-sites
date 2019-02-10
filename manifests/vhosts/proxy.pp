@@ -32,6 +32,8 @@ define sites::vhosts::proxy (
   $webroot=undef,
   # configure client certificate authentication using this CA
   $client_ca=undef,
+  Optional[String] $auth_basic=undef,
+  Optional[String] $auth_basic_user_file=undef,
   $caching=undef,
   $proxy_timeout='10s',
 ){
@@ -59,6 +61,9 @@ define sites::vhosts::proxy (
       'set $backend' => "http://${proxy}",
     },
     client_ca           => $client_ca,
+    auth_basic          => $auth_basic,
+    auth_basic_user_file => $auth_basic_user_file,
+
     caching             => $caching,
     proxy_timeout       => $proxy_timeout,
   }
