@@ -7,7 +7,7 @@ define sites::vhosts::disabled (
   # additional subdomains (no www.)
   $subdomains=[],
   # http://web.archive.org/web/20101230024259/http://no-www.org:80/index.php
-  Pattern[/^class_[abc]$/] 
+  Pattern[/^class_[abc]$/]
     $nowww_compliance='class_b',
   # connection settings
   $ipv6=true,

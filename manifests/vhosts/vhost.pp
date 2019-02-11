@@ -50,7 +50,7 @@ define sites::vhosts::vhost (
     $listen_options = 'default_server'
     $ipv6_listen_options = 'default_server'
 
-    if $nowww_compliance !~ /^class_c$'/ {
+    if $nowww_compliance != 'class_c' {
       fail('realm must have Class C nowww compliance')
     }
   } else {
@@ -239,8 +239,8 @@ define sites::vhosts::vhost (
     ssl_client_cert       => $ssl_client_cert,
     ssl_verify_client     => $ssl_verify_client,
     # basic auth
-    auth_basic          => $auth_basic,
-    auth_basic_user_file => $auth_basic_user_file,
+    auth_basic            => $auth_basic,
+    auth_basic_user_file  => $auth_basic_user_file,
     # ignore security headers from upstream and enforce on webserver level
     proxy_hide_header     => [
       'X-Frame-Options',

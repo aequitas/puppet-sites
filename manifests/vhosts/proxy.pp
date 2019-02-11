@@ -38,34 +38,34 @@ define sites::vhosts::proxy (
   $proxy_timeout='10s',
 ){
   sites::vhosts::vhost { $name:
-    domain              => $domain,
-    realm               => $realm,
-    default_vhost       => $default_vhost,
-    subdomains          => $subdomains,
-    nowww_compliance    => $nowww_compliance,
-    ipv6                => $ipv6,
-    ssl                 => $ssl,
-    rewrite_to_https    => $rewrite_to_https,
-    ssl_ciphers         => $ssl_ciphers,
-    ssl_dhparam         => $ssl_dhparam,
-    expires             => $expires,
-    static_expires      => $static_expires,
-    location_allow      => $location_allow,
-    location_deny       => $location_deny,
-    root                => $root,
+    domain               => $domain,
+    realm                => $realm,
+    default_vhost        => $default_vhost,
+    subdomains           => $subdomains,
+    nowww_compliance     => $nowww_compliance,
+    ipv6                 => $ipv6,
+    ssl                  => $ssl,
+    rewrite_to_https     => $rewrite_to_https,
+    ssl_ciphers          => $ssl_ciphers,
+    ssl_dhparam          => $ssl_dhparam,
+    expires              => $expires,
+    static_expires       => $static_expires,
+    location_allow       => $location_allow,
+    location_deny        => $location_deny,
+    root                 => $root,
     # use variable for proxy destination icw resolver, this won't cause
     # nginx to fail if the address is unresolvable during start
-    proxy               => "\$backend",
-    resolver            => $resolver,
-    location_cfg_append => {
+    proxy                => "\$backend",
+    resolver             => $resolver,
+    location_cfg_append  => {
       'set $backend' => "http://${proxy}",
     },
-    client_ca           => $client_ca,
-    auth_basic          => $auth_basic,
+    client_ca            => $client_ca,
+    auth_basic           => $auth_basic,
     auth_basic_user_file => $auth_basic_user_file,
 
-    caching             => $caching,
-    proxy_timeout       => $proxy_timeout,
+    caching              => $caching,
+    proxy_timeout        => $proxy_timeout,
   }
 
   if $webroot {

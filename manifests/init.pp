@@ -67,7 +67,7 @@ class sites (
   class {'nginx':
     package_ensure          => latest,
     # global caching settings
-    fastcgi_cache_path      => "/var/cache/nginx/",
+    fastcgi_cache_path      => '/var/cache/nginx/',
     fastcgi_cache_key       => '"$scheme$request_method$host$request_uri"',
     fastcgi_cache_keys_zone => 'default:250m',
     fastcgi_cache_max_size  => '500m',
@@ -95,7 +95,7 @@ class sites (
   file {
     $root:
       ensure => directory;
-    "/var/cache/nginx":
+    '/var/cache/nginx':
       ensure => directory;
   }
 
@@ -104,12 +104,12 @@ class sites (
     class { '::mysql::server':
       # a random password is generated for mysql root (and backup)
       # to login as mysql root use `mysql` as root user or sudo `sudo -i mysql`
-      root_password           => simplib::passgen("mysql_root", {'length' => 32}),
+      root_password           => simplib::passgen('mysql_root', {'length' => 32}),
       remove_default_accounts => true,
     }
     class { '::mysql::server::backup':
       backupuser        => backup,
-      backuppassword    => simplib::passgen("mysql_backup", {'length' => 32}),
+      backuppassword    => simplib::passgen('mysql_backup', {'length' => 32}),
       backupdir         => '/var/backups/mysql/',
       file_per_database => true,
       backuprotate      => $mysql_backuprotate,

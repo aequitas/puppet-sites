@@ -88,8 +88,8 @@ define sites::apps::wordpress (
       match  => "^define.'WP_SITEURL'";
   }
 
-  Package['nginx'] ->
-  php::fpm::conf { $name:
+  Package['nginx']
+  -> php::fpm::conf { $name:
     listen               => "/var/run/php5-fpm-${name}.sock",
     user                 => $web_user,
     listen_owner         => $web_user,
