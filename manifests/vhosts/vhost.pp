@@ -43,7 +43,7 @@ define sites::vhosts::vhost (
     $letsencrypt_name = $realm
 
     # only include a realm domain for this vhost if responing on defaulthost
-    if $::sites::default_host {
+    if $default_vhost {
       $realm_name = $realm
     }
 
@@ -58,7 +58,7 @@ define sites::vhosts::vhost (
     $letsencrypt_name = $server_name
 
     # only include a realm domain for this vhost if responing on defaulthost
-    if $::sites::default_host {
+    if $default_vhost {
       $realm_host = regsubst($server_name, '\.', '-')
       $realm_name = "${realm_host}.${realm}"
     } else {
