@@ -36,6 +36,7 @@ define sites::vhosts::proxy (
   Optional[String] $auth_basic_user_file=undef,
   $caching=undef,
   $proxy_timeout='10s',
+  $location_cfg_append=undef,
 ){
   sites::vhosts::vhost { $name:
     domain               => $domain,
@@ -57,9 +58,9 @@ define sites::vhosts::proxy (
     # nginx to fail if the address is unresolvable during start
     proxy                => "\$backend",
     resolver             => $resolver,
-    location_cfg_append  => {
+    location_cfg_append  => merge($location_cfg_append, {
       'set $backend' => "http://${proxy}",
-    },
+    }),
     client_ca            => $client_ca,
     auth_basic           => $auth_basic,
     auth_basic_user_file => $auth_basic_user_file,
