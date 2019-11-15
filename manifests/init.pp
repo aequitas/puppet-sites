@@ -42,6 +42,12 @@ class sites (
   # configure global letsencrypt if SSL is enabled
   if $ssl {
     class { 'letsencrypt': }
+
+    File['/etc/letsencrypt.sh/config']
+    ~> exec {'register letsencrypt':
+      command => '/etc/letsencrypt.sh/letsencrypt.sh --register --accept-terms',
+      refreshonly => true
+    }
   }
 
   # only offer secure ssl ciphers:
