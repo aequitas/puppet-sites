@@ -307,6 +307,7 @@ define sites::vhosts::vhost (
       server         => $name,
       location_alias => $::letsencrypt::www_root,
       priority       => 401,
+      auth_basic     => off,
     }
     if $rewrite_www_to_non_www {
       nginx::resource::location { "letsencrypt_www-${name}":
@@ -314,6 +315,7 @@ define sites::vhosts::vhost (
         server         => "www-${name}",
         location_alias => $::letsencrypt::www_root,
         priority       => 401,
+        auth_basic     => off,
       }
     }
   }
