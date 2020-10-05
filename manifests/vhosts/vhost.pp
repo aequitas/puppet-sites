@@ -16,6 +16,7 @@ define sites::vhosts::vhost (
   $ssl=$::sites::ssl,
   $rewrite_to_https=$::sites::ssl,
   $ssl_ciphers=$::sites::ssl_ciphers,
+  $ssl_protocols=$::sites::ssl_protocols,
   $ssl_dhparam=$::sites::ssl_dhparam,
   # cache settings
   $expires='10m',
@@ -224,6 +225,7 @@ define sites::vhosts::vhost (
     ssl_key               => $keyfile,
     ssl_cert              => $certfile,
     ssl_ciphers           => $ssl_ciphers,
+    ssl_protocols    => $ssl_protocols,
     ssl_dhparam           => $ssl_dhparam,
     location_allow        => $location_allow,
     location_deny         => $location_deny,

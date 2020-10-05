@@ -15,6 +15,7 @@ define sites::vhosts::php (
   $ssl=$::sites::ssl,
   $rewrite_to_https=$::sites::ssl,
   $ssl_ciphers=$::sites::ssl_ciphers,
+  $ssl_protocols=$::sites::ssl_protocols,
   $ssl_dhparam=$::sites::ssl_dhparam,
   # cache settings
   $expires='10m',
@@ -49,6 +50,7 @@ define sites::vhosts::php (
     ssl              => $ssl,
     rewrite_to_https => $rewrite_to_https,
     ssl_ciphers      => $ssl_ciphers,
+    ssl_protocols    => $ssl_protocols,
     ssl_dhparam      => $ssl_dhparam,
     expires          => $expires,
     static_expires   => $static_expires,

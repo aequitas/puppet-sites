@@ -53,16 +53,16 @@ class sites (
   # only offer secure ssl ciphers:
   # https://blog.qualys.com/ssllabs/2013/08/05/configuring-apache-nginx-and-openssl-for-forward-secrecy
   if $ssl_secure {
-      $ssl_ciphers = 'EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!MEDIUM'
+    $ssl_protocols = 'TLSv1.3 TLSv1.2'
+
+      $ssl_ciphers = 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
+
+      $ssl_dhparam = '/etc/nginx/ffdhe2048.pem'
 
       # improve DH key for Forward secrecy
-      exec { 'generate DH key':
-        command => "/usr/bin/openssl dhparam -out dh${dh_keysize}.pem ${dh_keysize}",
-        cwd     => '/etc/nginx/',
-        creates => "/etc/nginx/dh${dh_keysize}.pem",
+      file {$ssl_dhparam:
+        source => 'puppet:///modules/sites/ffdhe2048.pem'
       }
-
-      $ssl_dhparam = "/etc/nginx/dh${dh_keysize}.pem"
   } else {
     # offer default configuration of compatible ciphers
     $ssl_ciphers = undef
