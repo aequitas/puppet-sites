@@ -93,7 +93,7 @@ define sites::vhosts::vhost (
     # add letsencrypt hostnames with www for every hostname
     $le_subdomains = unique(concat($subdomains, prefix(concat([], $letsencrypt_name, $subdomains), 'www.'), $realm_name))
     # listen to name, subdomains and all www. version of them
-    $listen_domains = concat([], $server_name, $le_subdomains, $realm_name)
+    $listen_domains = concat([], $server_name, $subdomains, $realm_name).filter |$x| {!empty($x)}
     $validate_domains = join($server_names, ' ')
     if $validate_domains !~ /^(?!.*www\.).*$/ {
       fail("Class A no-www compliance specified, but www. domain specified in title or subdomains : ${validate_domains}.")
@@ -193,6 +193,7 @@ define sites::vhosts::vhost (
     }
   }
 
+  $listen_domains_for_csp_header = join(prefix(suffix($listen_domains, "'"), "'"), " ")
   $security_headers = {
     # prevent browser from rendering page if it detects XSS attack
     'X-XSS-Protection' => '1; mode=block',
@@ -200,6 +201,9 @@ define sites::vhosts::vhost (
     'X-Frame-Options'           => 'SAMEORIGIN',
     # do not execute css/js if content-type is not valid
     'X-Content-Type-Options'    => nosniff,
+    # strict script-src and style-src CSP is currently blocked by VUE.js components (lmap.js) which inlines script into the DOM.
+    'Content-Security-Policy' => regsubst("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://*.tile.osm.org; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none';", "'", "\\\\\'", 'G'),
+    'Referrer-Policy' => 'same-origin',
   }
 
   # convert headers into list of add_header statements as puppet-nginx==6 doesn't support
