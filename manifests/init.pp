@@ -43,10 +43,12 @@ class sites (
   if $ssl {
     class { 'letsencrypt': }
 
-    File['/etc/letsencrypt.sh/config']
-    ~> exec {'register letsencrypt':
-      command => '/etc/letsencrypt.sh/letsencrypt.sh --register --accept-terms',
-      refreshonly => true
+    if $::letsencrypt::email {
+      File['/etc/letsencrypt.sh/config']
+      ~> exec {'register letsencrypt':
+        command => '/etc/letsencrypt.sh/letsencrypt.sh --register --accept-terms',
+        refreshonly => true
+      }
     }
   }
 
