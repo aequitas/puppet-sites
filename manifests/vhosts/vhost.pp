@@ -202,7 +202,7 @@ define sites::vhosts::vhost (
     # do not execute css/js if content-type is not valid
     'X-Content-Type-Options'    => nosniff,
     # strict script-src and style-src CSP is currently blocked by VUE.js components (lmap.js) which inlines script into the DOM.
-    'Content-Security-Policy' => regsubst("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://*.tile.osm.org; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none';", "'", "\\\\\'", 'G'),
+    'Content-Security-Policy' => regsubst("frame-ancestors 'self'; block-all-mixed-content; default-src 'self'; script-src 'self' 'unsafe-inline' https://maps.google.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: *.tile.osm.org *.googleapis.com *.gstatic.com maps.google.com; frame-src 'self' maps.googleapis.com maps.google.com; base-uri 'self'; form-action 'self'; object-src 'none'; connect-src 'self' maps.google.com maps.googleapis.com; font-src 'self' data:;", "'", "\\\\\'", 'G'),
     'Referrer-Policy' => 'same-origin',
   }
 
