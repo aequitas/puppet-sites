@@ -86,7 +86,7 @@ class sites (
       fastcgi_cache_lock => on,
     },
     log_format              => {
-      cache => '$remote_addr - $upstream_cache_status [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent',
+      cache => '$remote_addr - $upstream_cache_status [$time_local] "$request" $status $body_bytes_sent $http_referer "$http_user_agent"',
     },
     # enable compression on all responses
     gzip_proxied            => any,
