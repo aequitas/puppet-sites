@@ -202,7 +202,7 @@ define sites::vhosts::vhost (
     # do not execute css/js if content-type is not valid
     'X-Content-Type-Options'    => nosniff,
     # strict script-src and style-src CSP is currently blocked by VUE.js components (lmap.js) which inlines script into the DOM.
-    'Content-Security-Policy' => regsubst("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://*.tile.osm.org; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none';", "'", "\\\\\'", 'G'),
+    'Content-Security-Policy' => regsubst("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://*.tile.osm.org data:; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none';", "'", "\\\\\'", 'G'),
     'Referrer-Policy' => 'same-origin',
   }
 
