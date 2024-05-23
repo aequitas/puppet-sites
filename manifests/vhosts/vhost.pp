@@ -38,6 +38,8 @@ define sites::vhosts::vhost (
   # abstract cache configurations
   $caching=undef,
   $proxy_timeout='10s',
+  $cache_disk_size=1g,
+  $cache_mem_size=10m,
 ){
   if $default_vhost {
     $server_name = '_'
@@ -170,11 +172,11 @@ define sites::vhosts::vhost (
           "''" => $expires,
         }
       }
-      # setup a cache configuration with 10MB memory store, 1GB disk cache
+      # setup a cache configuration
       file { "/etc/nginx/conf.d/${server_name}.cache.conf":
         ensure  => present,
         content => "proxy_cache_path /var/cache/nginx/${server_name}/ inactive=14d \
-                    levels=1:2 keys_zone=${server_name}:10m max_size=1g use_temp_path=off;"
+                    levels=1:2 keys_zone=${server_name}:${cache_mem_size} max_size=${cache_disk_size} use_temp_path=off;"
       } -> Nginx::Resource::Server[$name]
     }
     # disable all caching except static files, also prevent upstream cache headers from propagating
